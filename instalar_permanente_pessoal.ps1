@@ -1,5 +1,5 @@
 param(
-    [string]$InstallDir = "$env:LOCALAPPDATA\App Orcamento Familiar",
+    [string]$InstallDir = "",
     [string]$AppName = "App Orcamento Familiar",
     [string]$Version = "1.1.0"
 )
@@ -7,15 +7,27 @@ param(
 $ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
+$InstallDrive = [System.IO.Path]::GetPathRoot($Root)
+if ([string]::IsNullOrWhiteSpace($InstallDir)) {
+    $InstallDir = Join-Path $InstallDrive "App Orcamento Familiar"
+}
 $SourceDir = Join-Path $Root "dist_personal"
 $ExeSource = Join-Path $SourceDir "main_personal.exe"
 $DbSource = Join-Path $SourceDir "budget_app.db"
+$LegacyInstallDir = Join-Path $env:LOCALAPPDATA "App Orcamento Familiar"
+$LegacyExeSource = Join-Path $LegacyInstallDir "AppOrcamentoFamiliar.exe"
+$LegacyDbSource = Join-Path $LegacyInstallDir "budget_app.db"
 $ExeDest = Join-Path $InstallDir "AppOrcamentoFamiliar.exe"
 $DbDest = Join-Path $InstallDir "budget_app.db"
 $BackupDir = Join-Path $InstallDir "backups"
 
 if (!(Test-Path -LiteralPath $ExeSource)) {
-    throw "Executavel nao encontrado: $ExeSource"
+    if (Test-Path -LiteralPath $LegacyExeSource) {
+        $ExeSource = $LegacyExeSource
+    }
+    else {
+        throw "Executavel nao encontrado: $ExeSource"
+    }
 }
 
 New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
@@ -27,6 +39,9 @@ if (Test-Path -LiteralPath $DbDest) {
 }
 elseif (Test-Path -LiteralPath $DbSource) {
     Copy-Item -LiteralPath $DbSource -Destination $DbDest -Force
+}
+elseif (Test-Path -LiteralPath $LegacyDbSource) {
+    Copy-Item -LiteralPath $LegacyDbSource -Destination $DbDest -Force
 }
 
 Copy-Item -LiteralPath $ExeSource -Destination $ExeDest -Force
