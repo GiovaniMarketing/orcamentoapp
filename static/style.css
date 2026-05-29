@@ -1,0 +1,21 @@
+/* Correção para o módulo de Poupança/Investimentos */
+.coluna-formularios .card {
+    /* Define uma altura máxima se for necessário, mas é melhor deixar o conteúdo guiar */
+    /* max-height: 400px; /* Apenas se a rolagem for a solução desejada */
+    overflow: visible; /* Garante que o conteúdo não seja cortado */
+}
+
+/* Otimiza o espaçamento vertical entre os inputs do formulário de poupança */
+#form-poupanca {
+    gap: 0.6rem; /* Reduz um pouco o espaçamento padrão entre os itens do formulário de poupança */
+}
+
+#form-poupanca label {
+    margin-bottom: -0.5rem; /* Puxa a label para mais perto do input anterior */
+    margin-top: 0.7rem; 
+}
+
+/* Ajuste o espaçamento do botão para que não fique muito alto */
+#form-poupanca > div { 
+    margin-top: 1rem !important; /* Adiciona um espaço antes da div dos botões */
+}

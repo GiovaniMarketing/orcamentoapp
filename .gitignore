@@ -1,0 +1,47 @@
+# Python/cache
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# Virtual environments
+venv/
+venv_app/
+.venv/
+
+# Build outputs
+build/
+build_*/
+dist/
+dist_*/
+trial/
+TRIAL_ENVIAR_CLIENTE/
+pacotes_clientes/
+*.spec.bak
+
+# Generated packages and executables
+*.exe
+*.zip
+
+# Databases and local data
+*.db
+*.sqlite
+*.sqlite3
+backups/
+data/
+
+# Logs/runtime
+*.log
+app_log.txt
+
+# Local/system files
+desktop.ini
+0
+bool
+Dict[[]str
+FastAPI
+List[[]Dict[[]str
+List[[]dict]
+Optional[[]dict]
+Optional[[]PoupancaMovimentoRegistro]
+pyinstaller --name OrcamentoApp --o.txt
