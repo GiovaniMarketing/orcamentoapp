@@ -59,6 +59,17 @@ def criar_banco_vazio(db_path: Path):
             taxa_sugerida_mensal REAL NOT NULL DEFAULT 0
         )
     """)
+    cursor.execute("""
+        CREATE TABLE metas (
+            id INTEGER PRIMARY KEY,
+            nome TEXT NOT NULL,
+            valor_alvo REAL NOT NULL,
+            valor_atual REAL NOT NULL DEFAULT 0,
+            data_limite DATE,
+            observacoes TEXT,
+            criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
     cursor.executemany(
         "INSERT INTO tipos_investimento (nome, taxa_sugerida_mensal) VALUES (?, ?)",
         [

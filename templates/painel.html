@@ -90,6 +90,14 @@
         .licenca-status.critico { border-left-color: var(--cor-perigo); }
         .licenca-status p { margin: 0.25rem 0; font-size: 0.9rem; color: var(--cor-texto); }
         .licenca-status small { color: var(--cor-texto-claro); }
+        .tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.6rem; }
+        .tool-grid button, .tool-grid label { width: 100%; background: var(--cor-primaria); color: white; border-radius: 6px; padding: 0.65rem; text-align: center; box-sizing: border-box; cursor: pointer; font-weight: 700; font-size: 0.85rem; }
+        .tool-grid input[type="file"] { display: none; }
+        .alerta-lista, .metas-lista { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
+        .alerta-lista li, .metas-lista li { background: var(--cor-fundo); border-radius: 6px; padding: 0.65rem; font-size: 0.86rem; }
+        .meta-barra { height: 8px; background: #dbe1ea; border-radius: 99px; overflow: hidden; margin-top: 0.45rem; }
+        .meta-barra span { display: block; height: 100%; background: var(--cor-sucesso); }
+        .privado .valor-sensivel { filter: blur(7px); user-select: none; }
         
         /* Relatórios e Utilitários */
         .relatorio-item { padding: 0.4rem 0; display: flex; justify-content: space-between; font-size: 0.85rem; }
@@ -165,10 +173,10 @@
     <div class="card" style="grid-column: 1 / -1;">
         <h2>Resumo Financeiro</h2>
         <div class="indicadores">
-            <div class="indicador"><h3>Saldo Real</h3> <p id="saldo-real">R$ 0,00</p></div>
-            <div class="indicador"><h3>Receitas Confirmadas</h3> <p id="total-receitas-geral">R$ 0,00</p></div>
-            <div class="indicador"><h3>Despesas Confirmadas</h3> <p id="total-despesas-geral">R$ 0,00</p></div>
-            <div class="indicador"><h3>Saldo de Investimentos</h3> <p id="saldo-investimentos">R$ 0,00</p></div>
+            <div class="indicador"><h3>Saldo Real</h3> <p id="saldo-real" class="valor-sensivel">R$ 0,00</p></div>
+            <div class="indicador"><h3>Receitas Confirmadas</h3> <p id="total-receitas-geral" class="valor-sensivel">R$ 0,00</p></div>
+            <div class="indicador"><h3>Despesas Confirmadas</h3> <p id="total-despesas-geral" class="valor-sensivel">R$ 0,00</p></div>
+            <div class="indicador"><h3>Saldo de Investimentos</h3> <p id="saldo-investimentos" class="valor-sensivel">R$ 0,00</p></div>
         </div>
     </div>
 
@@ -254,6 +262,19 @@
                 </div>
             </div>
 
+            <div class="card">
+                <h2>Ferramentas</h2>
+                <div class="tool-grid">
+                    <button type="button" onclick="criarBackup()">Backup</button>
+                    <button type="button" onclick="baixarRelatorioMensal()">Relatorio Mensal</button>
+                    <button type="button" onclick="alternarPrivacidade()">Privacidade</button>
+                    <button type="button" onclick="mostrarSobre()">Sobre</button>
+                    <label for="arquivo-extrato">Importar Extrato</label>
+                    <input type="file" id="arquivo-extrato" accept=".csv,.ofx">
+                </div>
+                <p id="ferramentas-status" class="loading-placeholder" style="margin-bottom: 0;"></p>
+            </div>
+
             <!-- Listas de Transações -->
             <div class="grid-ultimas" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="card lista-transacoes">
@@ -269,6 +290,27 @@
 
         <!-- Coluna direita: Relatórios e Investimentos -->
         <div class="coluna-direita">
+            <div class="card">
+                <h2>Alertas do Mes</h2>
+                <div id="resumo-alertas"><p class="loading-placeholder">Carregando alertas...</p></div>
+                <ul id="lista-alertas" class="alerta-lista"></ul>
+            </div>
+
+            <div class="card">
+                <h2>Metas Financeiras</h2>
+                <form id="form-meta">
+                    <label for="meta-nome">Meta:</label>
+                    <input type="text" id="meta-nome" placeholder="Ex: Reserva de emergencia" required>
+                    <label for="meta-alvo">Valor alvo:</label>
+                    <input type="number" step="0.01" id="meta-alvo" required>
+                    <label for="meta-atual">Valor atual:</label>
+                    <input type="number" step="0.01" id="meta-atual" value="0">
+                    <label for="meta-limite">Data limite:</label>
+                    <input type="date" id="meta-limite">
+                    <button type="submit" class="btn-salvar">Adicionar Meta</button>
+                </form>
+                <ul id="lista-metas" class="metas-lista" style="margin-top: 1rem;"></ul>
+            </div>
             <!-- Análise de Despesas -->
             <div class="card">
                 <h2>Análise de Despesas do Mês</h2>
@@ -412,6 +454,7 @@
     // --- Variáveis dos Gráficos ---
     let graficoSaldoChart = null;
     let graficoDespesasChart = null;
+    let statusLicencaCache = null;
 
     // --- Função Principal da API ---
     async function chamarAPI(endpoint, method = 'GET', body = null) {
@@ -464,7 +507,7 @@
                      <span>${item.descricao} (${item.categoria}) ${item.recorrente ? '— Recorrente' : ''}</span>
                      <span>${dataInfo}</span>
                  </div>
-                 <span class="${valorClass}">${formatarMoeda(item.valor)}</span>
+                 <span class="${valorClass} valor-sensivel">${formatarMoeda(item.valor)}</span>
                  <div class="acoes">
                      <button class="btn-acao btn-edit" onclick="abrirModalEdicao('${tipo}', ${item.id})" title="Editar">✏️</button>
                      <button class="btn-acao btn-delete" onclick="deletarTransacao('${tipo}', ${item.id})" title="Deletar">🗑️</button>
@@ -582,6 +625,7 @@
 
         try {
             const status = await chamarAPI('/api/licenca/status');
+            statusLicencaCache = status;
             card.style.display = 'block';
             card.classList.remove('alerta', 'critico');
             const dias = status.dias_restantes;
@@ -669,6 +713,121 @@
         }
     }
 
+    async function buscarAlertas() {
+        const mes = document.getElementById('mes-analise').value;
+        const ano = document.getElementById('ano-analise').value;
+        const resumo = document.getElementById('resumo-alertas');
+        const lista = document.getElementById('lista-alertas');
+        if (!resumo || !lista || !mes || !ano) return;
+        try {
+            const dados = await chamarAPI(`/api/dashboard/alertas?ano=${ano}&mes=${mes}`);
+            resumo.innerHTML = `
+                <div class="relatorio-item"><span>A vencer no mes</span><strong class="valor-sensivel">${formatarMoeda(dados.total_a_vencer_mes || 0)}</strong></div>
+                <div class="relatorio-item"><span>Ja pago no mes</span><strong class="valor-sensivel">${formatarMoeda(dados.total_pago_mes || 0)}</strong></div>
+                <div class="relatorio-item"><span>Sobra prevista</span><strong class="valor-sensivel">${formatarMoeda(dados.sobra_prevista_mes || 0)}</strong></div>
+                <div class="relatorio-item"><span>Maior categoria</span><strong>${dados.maior_categoria ? dados.maior_categoria.categoria : '-'}</strong></div>
+            `;
+            const contas = dados.contas_vencendo_7_dias || [];
+            lista.innerHTML = contas.length ? contas.map(c => `<li>${c.descricao} - <span class="valor-sensivel">${formatarMoeda(c.valor)}</span> - vence ${formatarData(c.data_vencimento)}</li>`).join('') : '<li>Nenhuma conta vencendo nos proximos 7 dias.</li>';
+        } catch (error) {
+            resumo.innerHTML = '<p class="erro">Erro ao carregar alertas.</p>';
+        }
+    }
+
+    async function carregarMetas() {
+        const lista = document.getElementById('lista-metas');
+        if (!lista) return;
+        try {
+            const metas = await chamarAPI('/api/metas');
+            if (!metas.length) {
+                lista.innerHTML = '<li>Nenhuma meta cadastrada.</li>';
+                return;
+            }
+            lista.innerHTML = metas.map(meta => {
+                const pct = Math.min(100, Math.round(((meta.valor_atual || 0) / meta.valor_alvo) * 100));
+                return `<li>
+                    <strong>${meta.nome}</strong>
+                    <div><span class="valor-sensivel">${formatarMoeda(meta.valor_atual || 0)}</span> de <span class="valor-sensivel">${formatarMoeda(meta.valor_alvo)}</span> (${pct}%)</div>
+                    <div class="meta-barra"><span style="width:${pct}%"></span></div>
+                    <div style="margin-top:0.4rem; display:flex; gap:0.4rem;">
+                        <button class="btn-acao btn-edit" onclick="atualizarValorMeta(${meta.id}, ${meta.valor_atual || 0})">+ Valor</button>
+                        <button class="btn-acao btn-delete" onclick="deletarMeta(${meta.id})">Excluir</button>
+                    </div>
+                </li>`;
+            }).join('');
+        } catch (error) {
+            lista.innerHTML = '<li class="erro">Erro ao carregar metas.</li>';
+        }
+    }
+
+    async function atualizarValorMeta(id, valorAtual) {
+        const entrada = prompt("Quanto deseja adicionar a esta meta?", "0");
+        if (entrada === null) return;
+        const acrescimo = parseFloat(entrada.replace(',', '.'));
+        if (isNaN(acrescimo) || acrescimo <= 0) return alert("Informe um valor positivo.");
+        await chamarAPI(`/api/metas/${id}`, 'PUT', { valor_atual: valorAtual + acrescimo });
+        await carregarMetas();
+    }
+
+    async function deletarMeta(id) {
+        if (!confirm("Excluir esta meta?")) return;
+        await chamarAPI(`/api/metas/${id}`, 'DELETE');
+        await carregarMetas();
+    }
+
+    async function criarBackup() {
+        const status = document.getElementById('ferramentas-status');
+        status.textContent = "Criando backup...";
+        try {
+            const res = await chamarAPI('/api/backup/criar', 'POST');
+            status.textContent = `Backup criado: ${res.nome}`;
+        } catch (error) {
+            status.textContent = `Erro ao criar backup: ${error.message}`;
+        }
+    }
+
+    async function baixarRelatorioMensal() {
+        const mes = document.getElementById('mes-analise').value;
+        const ano = document.getElementById('ano-analise').value;
+        const response = await fetch(`${API_URL}/api/relatorio/mensal?ano=${ano}&mes=${mes}`);
+        if (!response.ok) return alert("Erro ao gerar relatorio mensal.");
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Relatorio_Mensal_${ano}_${String(mes).padStart(2, '0')}.html`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    }
+
+    function alternarPrivacidade() {
+        document.body.classList.toggle('privado');
+    }
+
+    function mostrarSobre() {
+        const s = statusLicencaCache || {};
+        alert(`App Orcamento Familiar\nVersao: 1.1\nLicenca: ${s.tipo_licenca || 'N/I'}\nCliente: ${s.cliente_nome || 'N/I'}\nEmail: ${s.cliente_email || 'N/I'}\nVencimento: ${s.expira_em ? formatarData(s.expira_em) : 'N/I'}\nSuporte: informe seu contato comercial`);
+    }
+
+    async function importarExtratoSelecionado(file) {
+        const status = document.getElementById('ferramentas-status');
+        if (!file) return;
+        const formData = new FormData();
+        formData.append('arquivo', file);
+        status.textContent = "Importando extrato...";
+        try {
+            const response = await fetch(`${API_URL}/api/importar/extrato`, { method: 'POST', body: formData });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.detail || 'Erro ao importar.');
+            status.textContent = `Importados: ${data.importados}. Ignorados: ${data.ignorados}. Lidos: ${data.lidos}.`;
+            await atualizarTudo();
+        } catch (error) {
+            status.textContent = `Erro ao importar: ${error.message}`;
+        }
+    }
+
     async function carregarTiposInvestimento() {
         const selectTipos = document.getElementById('poupanca-tipo-investimento');
         const inputTaxa = document.getElementById('poupanca-taxa');
@@ -718,7 +877,9 @@
             buscarStatusLicenca(),
             carregarDadosIniciais(), 
             buscarSaldoAtual(), 
-            buscarAnalise() 
+            buscarAnalise(),
+            buscarAlertas(),
+            carregarMetas()
         ]);
         results.forEach((result, index) => { if (result.status === 'rejected') console.error(`Erro ao atualizar seção ${index}:`, result.reason); });
         console.log("Atualização concluída.");
@@ -737,6 +898,29 @@
     document.getElementById('form-despesa').addEventListener('submit', (e) => { 
         e.preventDefault(); 
         adicionarTransacao('despesa', e.target); 
+    });
+
+    document.getElementById('form-meta').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+            nome: document.getElementById('meta-nome').value.trim(),
+            valor_alvo: parseFloat(document.getElementById('meta-alvo').value),
+            valor_atual: parseFloat(document.getElementById('meta-atual').value || '0'),
+            data_limite: document.getElementById('meta-limite').value || null
+        };
+        if (!payload.nome || isNaN(payload.valor_alvo) || payload.valor_alvo <= 0) {
+            alert("Informe nome e valor alvo positivo.");
+            return;
+        }
+        await chamarAPI('/api/metas', 'POST', payload);
+        e.target.reset();
+        document.getElementById('meta-atual').value = 0;
+        await carregarMetas();
+    });
+
+    document.getElementById('arquivo-extrato').addEventListener('change', (e) => {
+        importarExtratoSelecionado(e.target.files[0]);
+        e.target.value = '';
     });
 
     async function adicionarTransacao(tipo, formElement) {

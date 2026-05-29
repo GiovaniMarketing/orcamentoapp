@@ -2,6 +2,18 @@
 
 Aplicativo local para controle financeiro familiar, com receitas, despesas, investimentos simples, relatorio de imposto de renda e licenciamento para trial/pago.
 
+## Recursos do app
+
+- Controle de receitas, despesas, recorrencias e status pago/a vencer.
+- Painel com alertas do mes, contas vencendo, sobra prevista e maior categoria de gasto.
+- Metas financeiras com progresso.
+- Importacao opcional de extratos `.csv` e `.ofx`.
+- Backup local do banco `budget_app.db`.
+- Relatorio mensal em HTML imprimivel/salvavel em PDF pelo navegador.
+- Exportacao anual para apoio na declaracao de imposto de renda.
+- Modo privacidade para ocultar valores na tela.
+- Status de licenca visivel no painel.
+
 ## Estrutura principal
 
 - `main_cliente.py`: versao cliente licenciada com PySide6.

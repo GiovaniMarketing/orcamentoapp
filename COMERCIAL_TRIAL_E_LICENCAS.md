@@ -46,3 +46,13 @@ Isso gera uma nova licença paga por 365 dias com base na data de implantação 
 
 A versão cliente/trial usa PySide6 em vez de PyQt6.
 Mantenha os avisos de bibliotecas na pasta `licenses` do pacote distribuído.
+
+## Recursos incluidos na versao cliente
+
+- Status de licenca no painel.
+- Backup manual do banco local.
+- Alertas de contas a vencer e sobra prevista.
+- Metas financeiras.
+- Importacao opcional de extrato CSV/OFX.
+- Relatorio mensal em HTML imprimivel.
+- Modo privacidade para ocultar valores na tela.
