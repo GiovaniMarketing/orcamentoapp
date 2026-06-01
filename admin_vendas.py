@@ -5,6 +5,7 @@ from datetime import date, datetime, timedelta
 from html import escape
 import os
 from pathlib import Path
+from threading import Timer
 
 import uvicorn
 from fastapi import FastAPI, Form, HTTPException, Query
@@ -318,10 +319,17 @@ def html_page() -> str:
             small {{ color: #6b7280; }}
             .actions {{ display: flex; gap: 8px; align-items: end; }}
             .nota {{ margin-top: -4px; color: #4b5563; font-size: 14px; line-height: 1.45; }}
+            .topo {{ display: flex; align-items: center; justify-content: space-between; gap: 16px; }}
+            .perigo {{ background: #b42318; }}
         </style>
     </head>
     <body><main>
-        <h1>Admin de Vendas - OrcamentoApp</h1>
+        <div class="topo">
+            <h1>Admin de Vendas - OrcamentoApp</h1>
+            <form method="post" action="/finalizar">
+                <button class="perigo">Finalizar painel</button>
+            </form>
+        </div>
         <section>
             <h2>Armazenamento temporario</h2>
             <p><strong>Pasta:</strong> {escape(str(PACOTES_DIR))}</p>
@@ -480,6 +488,23 @@ def regerar_pacote_rota(venda_id: int):
 def limpar_pacotes_antigos_rota():
     limpar_pacotes_antigos()
     return RedirectResponse("/", status_code=303)
+
+
+@app.post("/finalizar", response_class=HTMLResponse)
+def finalizar():
+    Timer(0.7, lambda: os._exit(0)).start()
+    return HTMLResponse(
+        """
+        <!doctype html>
+        <html lang="pt-BR">
+        <head><meta charset="utf-8"><title>Painel finalizado</title></head>
+        <body style="font-family:Segoe UI,Arial,sans-serif;padding:32px;color:#243041">
+            <h1>Painel administrativo finalizado.</h1>
+            <p>Voce pode fechar esta aba do navegador.</p>
+        </body>
+        </html>
+        """
+    )
 
 
 if __name__ == "__main__":

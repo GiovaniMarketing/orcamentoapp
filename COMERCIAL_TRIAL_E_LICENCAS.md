@@ -69,6 +69,8 @@ O painel mostra o espaco ocupado e oferece:
 
 Ao abrir o Admin de Vendas, pacotes temporarios com mais de 15 dias tambem sao removidos automaticamente.
 
+Para encerrar o servidor administrativo em segundo plano, use `Finalizar painel` no topo da tela.
+
 ## Renovacao anual
 
 Depois de conferir o PIX de renovacao, localize o cliente ativo e clique em `Confirmar PIX e renovar 1 ano`.

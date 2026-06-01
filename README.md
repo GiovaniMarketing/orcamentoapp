@@ -42,3 +42,5 @@ O Admin de Vendas gera pastas exclusivas com ID e nome do cliente:
 Vendas pagas ficam com status `AGUARDANDO_PIX`. A licenca anual so e gerada depois da confirmacao manual do pagamento no extrato.
 
 Depois de enviar um pacote, use `Excluir apos envio` no Admin de Vendas. O painel preserva a licenca no banco e permite `Gerar novamente` quando necessario. Pacotes temporarios com mais de 15 dias sao removidos automaticamente.
+
+Para encerrar o servidor administrativo, use `Finalizar painel` no topo da tela.
