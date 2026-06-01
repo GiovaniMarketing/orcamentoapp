@@ -269,8 +269,12 @@ class TipoInvestimentoRegistro(TipoInvestimento):
 class SaldoAtual(BaseModel):
     total_receitas: float
     total_despesas: float
+    receitas_confirmadas: float
+    despesas_confirmadas: float
     total_poupanca: float
     saldo_real_confirmado: float
+    saldo_previsto: float
+    patrimonio_atual: float
 
 class AnaliseCategoria(BaseModel):
     categoria: str
@@ -331,7 +335,7 @@ def db_get_saldo_atual() -> Optional[dict]:
         cursor = conn.cursor()
         
         # (ATUALIZADO) Saldo de Investimentos agora usa a tabela 'poupanca'
-        cursor.execute("SELECT SUM(CASE WHEN tipo='deposito' THEN valor ELSE -valor END) FROM poupanca")
+        cursor.execute("SELECT SUM(CASE WHEN tipo='deposito' THEN valor WHEN tipo='retirada' THEN -valor ELSE 0 END) FROM poupanca")
         total_poupanca = cursor.fetchone()[0] or 0.0
         
         # Saldo Real (Confirmado)
@@ -347,10 +351,14 @@ def db_get_saldo_atual() -> Optional[dict]:
         total_despesas = cursor.fetchone()[0] or 0.0
         
         return {
-            "total_receitas": total_receitas,
-            "total_despesas": total_despesas,
-            "total_poupanca": total_poupanca,
-            "saldo_real_confirmado": receitas_confirmadas - despesas_confirmadas
+            "total_receitas": round(total_receitas, 2),
+            "total_despesas": round(total_despesas, 2),
+            "receitas_confirmadas": round(receitas_confirmadas, 2),
+            "despesas_confirmadas": round(despesas_confirmadas, 2),
+            "total_poupanca": round(total_poupanca, 2),
+            "saldo_real_confirmado": round(receitas_confirmadas - despesas_confirmadas, 2),
+            "saldo_previsto": round(total_receitas - total_despesas, 2),
+            "patrimonio_atual": round(receitas_confirmadas - despesas_confirmadas + total_poupanca, 2),
         }
     except Exception as e:
         logging.error(f"Erro ao calcular saldo atual: {e}", exc_info=True)

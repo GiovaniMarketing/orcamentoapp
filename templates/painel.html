@@ -180,7 +180,9 @@
             <div class="indicador"><h3>Saldo Real</h3> <p id="saldo-real" class="valor-sensivel">R$ 0,00</p></div>
             <div class="indicador"><h3>Receitas Confirmadas</h3> <p id="total-receitas-geral" class="valor-sensivel">R$ 0,00</p></div>
             <div class="indicador"><h3>Despesas Confirmadas</h3> <p id="total-despesas-geral" class="valor-sensivel">R$ 0,00</p></div>
+            <div class="indicador"><h3>Saldo Previsto</h3> <p id="saldo-previsto" class="valor-sensivel">R$ 0,00</p></div>
             <div class="indicador"><h3>Saldo de Investimentos</h3> <p id="saldo-investimentos" class="valor-sensivel">R$ 0,00</p></div>
+            <div class="indicador"><h3>Patrimonio Atual</h3> <p id="patrimonio-atual" class="valor-sensivel">R$ 0,00</p></div>
         </div>
     </div>
 
@@ -501,9 +503,11 @@
     
     function renderizarIndicadores(saldo) {
         document.getElementById('saldo-real').textContent = formatarMoeda(saldo.saldo_real_confirmado);
-        document.getElementById('total-receitas-geral').textContent = formatarMoeda(saldo.total_receitas);
-        document.getElementById('total-despesas-geral').textContent = formatarMoeda(saldo.total_despesas);
+        document.getElementById('total-receitas-geral').textContent = formatarMoeda(saldo.receitas_confirmadas);
+        document.getElementById('total-despesas-geral').textContent = formatarMoeda(saldo.despesas_confirmadas);
+        document.getElementById('saldo-previsto').textContent = formatarMoeda(saldo.saldo_previsto);
         document.getElementById('saldo-investimentos').textContent = formatarMoeda(saldo.total_poupanca);
+        document.getElementById('patrimonio-atual').textContent = formatarMoeda(saldo.patrimonio_atual);
     }
     
     function renderizarLista(tipo, items) {
@@ -631,7 +635,9 @@
             document.getElementById('saldo-real').textContent = 'Erro';
             document.getElementById('total-receitas-geral').textContent = 'Erro';
             document.getElementById('total-despesas-geral').textContent = 'Erro';
+            document.getElementById('saldo-previsto').textContent = 'Erro';
             document.getElementById('saldo-investimentos').textContent = 'Erro';
+            document.getElementById('patrimonio-atual').textContent = 'Erro';
         }
     }
 
