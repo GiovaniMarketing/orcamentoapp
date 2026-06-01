@@ -1,3 +1,4 @@
+import argparse
 import shutil
 import sqlite3
 import zipfile
@@ -10,6 +11,7 @@ from licenciamento import gerar_licenca
 BASE_PATH = Path(__file__).resolve().parent
 TRIAL_DIR = BASE_PATH / "trial"
 DIST_CLIENTE = BASE_PATH / "dist_cliente"
+BASE_CLIENTE_DIR = BASE_PATH / "base_cliente"
 
 
 def criar_banco_vazio(db_path: Path):
@@ -84,20 +86,38 @@ def criar_banco_vazio(db_path: Path):
     conn.close()
 
 
-def criar_trial():
+def criar_base_cliente():
     exe_origem = DIST_CLIENTE / "OrcamentoApp.exe"
     if not exe_origem.exists():
         raise FileNotFoundError("Execute o build do cliente antes: PyInstaller main_cliente.spec")
 
+    if BASE_CLIENTE_DIR.exists():
+        shutil.rmtree(BASE_CLIENTE_DIR)
+    BASE_CLIENTE_DIR.mkdir()
+
+    shutil.copy2(exe_origem, BASE_CLIENTE_DIR / "OrcamentoApp.exe")
+    shutil.copytree(BASE_PATH / "templates", BASE_CLIENTE_DIR / "templates")
+    shutil.copytree(BASE_PATH / "static", BASE_CLIENTE_DIR / "static")
+    shutil.copy2(BASE_PATH / "favicon.ico", BASE_CLIENTE_DIR / "favicon.ico")
+    criar_banco_vazio(BASE_CLIENTE_DIR / "budget_app.db")
+
+    licencas_dir = BASE_CLIENTE_DIR / "licenses"
+    licencas_dir.mkdir(exist_ok=True)
+    (licencas_dir / "AVISOS_BIBLIOTECAS.txt").write_text(
+        "AVISOS DE BIBLIOTECAS\n\n"
+        "Este aplicativo usa Python, FastAPI, PyInstaller, PySide6/Qt for Python e outras bibliotecas de terceiros.\n"
+        "PySide6/Qt for Python pode ser usado sob termos LGPL/GPL ou licenca comercial da Qt, conforme o caso.\n"
+        "Os avisos completos das bibliotecas devem ser mantidos junto ao pacote distribuido.\n",
+        encoding="utf-8",
+    )
+    return BASE_CLIENTE_DIR
+
+
+def criar_trial():
+    criar_base_cliente()
     if TRIAL_DIR.exists():
         shutil.rmtree(TRIAL_DIR)
-    TRIAL_DIR.mkdir()
-
-    shutil.copy2(exe_origem, TRIAL_DIR / "OrcamentoApp.exe")
-    shutil.copytree(BASE_PATH / "templates", TRIAL_DIR / "templates")
-    shutil.copytree(BASE_PATH / "static", TRIAL_DIR / "static")
-    shutil.copy2(BASE_PATH / "favicon.ico", TRIAL_DIR / "favicon.ico")
-    criar_banco_vazio(TRIAL_DIR / "budget_app.db")
+    shutil.copytree(BASE_CLIENTE_DIR, TRIAL_DIR)
 
     conteudo, payload = gerar_licenca(
         "Cliente Trial",
@@ -126,16 +146,6 @@ def criar_trial():
         encoding="utf-8",
     )
 
-    licencas_dir = TRIAL_DIR / "licenses"
-    licencas_dir.mkdir(exist_ok=True)
-    (licencas_dir / "AVISOS_BIBLIOTECAS.txt").write_text(
-        "AVISOS DE BIBLIOTECAS\n\n"
-        "Este aplicativo usa Python, FastAPI, PyInstaller, PySide6/Qt for Python e outras bibliotecas de terceiros.\n"
-        "PySide6/Qt for Python pode ser usado sob termos LGPL/GPL ou licenca comercial da Qt, conforme o caso.\n"
-        "Os avisos completos das bibliotecas devem ser mantidos junto ao pacote distribuido.\n",
-        encoding="utf-8",
-    )
-
     zip_path = BASE_PATH / "OrcamentoApp_TRIAL.zip"
     if zip_path.exists():
         zip_path.unlink()
@@ -147,6 +157,13 @@ def criar_trial():
 
 
 if __name__ == "__main__":
-    pacote = criar_trial()
-    print(f"Trial criado em: {TRIAL_DIR}")
-    print(f"ZIP criado em: {pacote}")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--somente-base", action="store_true", help="Prepara a base reutilizavel sem gerar trial generico.")
+    args = parser.parse_args()
+    if args.somente_base:
+        criar_base_cliente()
+        print(f"Base cliente criada em: {BASE_CLIENTE_DIR}")
+    else:
+        pacote = criar_trial()
+        print(f"Trial criado em: {TRIAL_DIR}")
+        print(f"ZIP criado em: {pacote}")

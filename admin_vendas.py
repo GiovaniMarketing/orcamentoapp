@@ -2,6 +2,7 @@ import shutil
 import sqlite3
 import zipfile
 from datetime import date, datetime, timedelta
+from html import escape
 from pathlib import Path
 
 import uvicorn
@@ -14,7 +15,7 @@ from licenciamento import gerar_licenca
 BASE_PATH = Path(__file__).resolve().parent
 ADMIN_DB = BASE_PATH / "admin_vendas.db"
 PACOTES_DIR = BASE_PATH / "pacotes_clientes"
-TRIAL_DIR = BASE_PATH / "trial"
+BASE_CLIENTE_DIR = BASE_PATH / "base_cliente"
 
 app = FastAPI(title="OrcamentoApp - Admin de Vendas")
 
@@ -45,12 +46,23 @@ def init_db():
                 data_vencimento TEXT NOT NULL,
                 observacoes TEXT,
                 licenca_atual TEXT,
+                entrega_tipo TEXT NOT NULL DEFAULT 'INSTALACAO_COMPLETA',
+                pagamento_confirmado_em TEXT,
+                pasta_pacote TEXT,
                 pacote_zip TEXT,
                 criado_em TEXT NOT NULL,
                 atualizado_em TEXT NOT NULL
             )
             """
         )
+        colunas = {row["name"] for row in conn.execute("PRAGMA table_info(vendas)").fetchall()}
+        for nome, ddl in {
+            "entrega_tipo": "ALTER TABLE vendas ADD COLUMN entrega_tipo TEXT NOT NULL DEFAULT 'INSTALACAO_COMPLETA'",
+            "pagamento_confirmado_em": "ALTER TABLE vendas ADD COLUMN pagamento_confirmado_em TEXT",
+            "pasta_pacote": "ALTER TABLE vendas ADD COLUMN pasta_pacote TEXT",
+        }.items():
+            if nome not in colunas:
+                conn.execute(ddl)
 
 
 def row_to_dict(row):
@@ -61,26 +73,53 @@ def nome_seguro(texto: str) -> str:
     return "".join(c if c.isalnum() or c in ["-", "_"] else "_" for c in texto.strip()) or "cliente"
 
 
-def criar_pacote_cliente(venda: dict, conteudo_licenca: str) -> Path:
-    if not TRIAL_DIR.exists():
-        raise RuntimeError("Pasta trial ainda nao existe. Gere a pasta trial primeiro.")
-
-    nome_base = f"{venda['id']:04d}_{nome_seguro(venda['cliente_nome'])}_{venda['tipo'].lower()}"
-    work_dir = PACOTES_DIR / nome_base
-    zip_path = PACOTES_DIR / f"{nome_base}.zip"
-
-    if work_dir.exists():
-        shutil.rmtree(work_dir)
-    shutil.copytree(TRIAL_DIR, work_dir)
-    (work_dir / "license.key").write_text(conteudo_licenca, encoding="utf-8")
-
+def criar_zip(pasta: Path) -> Path:
+    zip_path = pasta.with_suffix(".zip")
     if zip_path.exists():
         zip_path.unlink()
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-        for arquivo in work_dir.rglob("*"):
+        for arquivo in pasta.rglob("*"):
             if arquivo.is_file():
-                zf.write(arquivo, arquivo.relative_to(work_dir))
+                zf.write(arquivo, arquivo.relative_to(pasta))
     return zip_path
+
+
+def criar_pacote_cliente(venda: dict, conteudo_licenca: str, tipo: str) -> tuple[Path, Path]:
+    entrega_tipo = venda.get("entrega_tipo") or "INSTALACAO_COMPLETA"
+    sufixo = "trial" if tipo.upper() == "TRIAL" else "ativacao" if entrega_tipo == "ATIVACAO_TRIAL" else "vendido"
+    nome_base = f"{venda['id']:04d}_{nome_seguro(venda['cliente_nome'])}_{sufixo}"
+    work_dir = PACOTES_DIR / nome_base
+
+    if work_dir.exists():
+        shutil.rmtree(work_dir)
+    if entrega_tipo == "ATIVACAO_TRIAL" and tipo.upper() != "TRIAL":
+        work_dir.mkdir(parents=True)
+    else:
+        if not BASE_CLIENTE_DIR.exists():
+            raise RuntimeError("Base cliente ainda nao existe. Execute criar_pasta_trial.py primeiro.")
+        shutil.copytree(BASE_CLIENTE_DIR, work_dir)
+
+    (work_dir / "license.key").write_text(conteudo_licenca, encoding="utf-8")
+    if entrega_tipo == "ATIVACAO_TRIAL" and tipo.upper() != "TRIAL":
+        texto = (
+            "ATIVACAO - APP ORCAMENTO FAMILIAR\n\n"
+            "1. Feche o aplicativo.\n"
+            "2. Faca backup do arquivo budget_app.db antes da ativacao.\n"
+            "3. Substitua somente o arquivo license.key da pasta atual por este novo arquivo.\n"
+            "4. Abra o aplicativo novamente. Seus dados cadastrados no trial permanecem preservados.\n"
+        )
+        (work_dir / "LEIA-ME_ATIVACAO.txt").write_text(texto, encoding="utf-8")
+    else:
+        texto = (
+            "APP ORCAMENTO FAMILIAR\n\n"
+            "1. Extraia todos os arquivos para uma pasta do computador.\n"
+            "2. Execute OrcamentoApp.exe.\n"
+            "3. Nao apague license.key nem budget_app.db.\n"
+            "4. Use o botao Backup dentro do aplicativo para preservar seus dados.\n"
+        )
+        (work_dir / "LEIA-ME.txt").write_text(texto, encoding="utf-8")
+
+    return work_dir, criar_zip(work_dir)
 
 
 def salvar_licenca(venda_id: int, tipo: str, dias: int, data_base: str | None = None) -> dict:
@@ -96,16 +135,18 @@ def salvar_licenca(venda_id: int, tipo: str, dias: int, data_base: str | None = 
             dias,
             data_base or venda["data_implantacao"],
         )
-        zip_path = criar_pacote_cliente({**venda, "tipo": tipo}, conteudo)
+        pasta_pacote, zip_path = criar_pacote_cliente({**venda, "tipo": tipo}, conteudo, tipo)
         vencimento = datetime.fromisoformat(payload["expira_em"]).date().isoformat()
         agora = datetime.now().isoformat(timespec="seconds")
+        pagamento_confirmado_em = agora if tipo.upper() == "PAGO" else venda.get("pagamento_confirmado_em")
         conn.execute(
             """
             UPDATE vendas
-            SET tipo = ?, status = ?, data_vencimento = ?, licenca_atual = ?, pacote_zip = ?, atualizado_em = ?
+            SET tipo = ?, status = ?, data_vencimento = ?, licenca_atual = ?,
+                pagamento_confirmado_em = ?, pasta_pacote = ?, pacote_zip = ?, atualizado_em = ?
             WHERE id = ?
             """,
-            (tipo.upper(), "ATIVO", vencimento, conteudo, str(zip_path), agora, venda_id),
+            (tipo.upper(), "ATIVO", vencimento, conteudo, pagamento_confirmado_em, str(pasta_pacote), str(zip_path), agora, venda_id),
         )
         return {"zip_path": zip_path, "payload": payload}
 
@@ -126,21 +167,33 @@ def html_page() -> str:
         pacote = ""
         if venda.get("pacote_zip") and Path(venda["pacote_zip"]).exists():
             pacote = f'<a href="/download/{venda["id"]}">baixar pacote</a>'
+        if venda["status"] == "AGUARDANDO_PIX":
+            acao = f"""
+                <form method="post" action="/vendas/{venda['id']}/confirmar-pix">
+                    <button>Confirmar PIX e gerar licenca</button>
+                </form>
+            """
+        elif venda["tipo"] == "PAGO":
+            acao = f"""
+                <form method="post" action="/vendas/{venda['id']}/renovar">
+                    <button>Confirmar PIX e renovar 1 ano</button>
+                </form>
+            """
+        else:
+            acao = "<small>Aguardando conversao em venda</small>"
         linhas.append(
             f"""
             <tr class="{classe}">
                 <td>{venda['id']}</td>
-                <td>{venda['cliente_nome']}<br><small>{venda['cliente_email']}</small></td>
+                <td>{escape(venda['cliente_nome'])}<br><small>{escape(venda['cliente_email'])}</small></td>
                 <td>{venda['tipo']}</td>
                 <td>{venda['status']}</td>
+                <td>{venda.get('entrega_tipo') or '-'}</td>
+                <td>{venda.get('pagamento_confirmado_em') or '-'}</td>
                 <td>{venda['data_implantacao']}</td>
                 <td>{venda['data_vencimento']}<br><small>{dias} dias</small></td>
                 <td>{pacote}</td>
-                <td>
-                    <form method="post" action="/vendas/{venda['id']}/renovar">
-                        <button>Renovar 1 ano</button>
-                    </form>
-                </td>
+                <td>{acao}</td>
             </tr>
             """
         )
@@ -170,12 +223,14 @@ def html_page() -> str:
             .critico td {{ background: #fff1f1; }}
             small {{ color: #6b7280; }}
             .actions {{ display: flex; gap: 8px; align-items: end; }}
+            .nota {{ margin-top: -4px; color: #4b5563; font-size: 14px; line-height: 1.45; }}
         </style>
     </head>
     <body><main>
         <h1>Admin de Vendas - OrcamentoApp</h1>
         <section>
-            <h2>Nova venda / trial</h2>
+            <h2>Novo trial ou venda</h2>
+            <p class="nota">TRIAL gera pacote completo por 7 dias. PAGO fica aguardando PIX e so gera a entrega depois da confirmacao no extrato.</p>
             <form class="grid" method="post" action="/vendas">
                 <div><label>Cliente</label><input name="cliente_nome" required></div>
                 <div><label>Email</label><input name="cliente_email" type="email" required></div>
@@ -184,17 +239,18 @@ def html_page() -> str:
                 <div><label>Ambiente</label><input name="ambiente" placeholder="Ex: notebook financeiro"></div>
                 <div><label>Valor</label><input name="valor" type="number" step="0.01" value="0"></div>
                 <div><label>Tipo</label><select name="tipo"><option>TRIAL</option><option>PAGO</option></select></div>
+                <div><label>Entrega</label><select name="entrega_tipo"><option value="INSTALACAO_COMPLETA">Instalacao completa</option><option value="ATIVACAO_TRIAL">Cliente ja possui trial: somente licenca</option></select></div>
                 <div><label>Data implantacao</label><input name="data_implantacao" type="date" value="{hoje.isoformat()}" required></div>
                 <div><label>Dias validade</label><input name="dias_validade" type="number" value="7" required></div>
                 <textarea name="observacoes" placeholder="Observacoes comerciais, instalacao, contato..."></textarea>
-                <div class="actions"><button>Cadastrar e gerar pacote</button></div>
+                <div class="actions"><button>Cadastrar</button></div>
             </form>
         </section>
         <section>
             <h2>Clientes e vencimentos</h2>
             <table>
-                <thead><tr><th>ID</th><th>Cliente</th><th>Tipo</th><th>Status</th><th>Implantacao</th><th>Vencimento</th><th>Pacote</th><th>Acao</th></tr></thead>
-                <tbody>{''.join(linhas) or '<tr><td colspan="8">Nenhuma venda cadastrada.</td></tr>'}</tbody>
+                <thead><tr><th>ID</th><th>Cliente</th><th>Tipo</th><th>Status</th><th>Entrega</th><th>PIX confirmado</th><th>Implantacao</th><th>Vencimento</th><th>Pacote</th><th>Acao</th></tr></thead>
+                <tbody>{''.join(linhas) or '<tr><td colspan="10">Nenhuma venda cadastrada.</td></tr>'}</tbody>
             </table>
         </section>
     </main></body></html>
@@ -215,11 +271,22 @@ def criar_venda(
     ambiente: str = Form(""),
     valor: float = Form(0),
     tipo: str = Form("TRIAL"),
+    entrega_tipo: str = Form("INSTALACAO_COMPLETA"),
     data_implantacao: str = Form(...),
     dias_validade: int = Form(7),
     observacoes: str = Form(""),
 ):
     tipo = tipo.upper()
+    entrega_tipo = entrega_tipo.upper()
+    if tipo == "TRIAL":
+        dias_validade = 7
+        entrega_tipo = "INSTALACAO_COMPLETA"
+    elif tipo == "PAGO":
+        dias_validade = 365
+    else:
+        raise HTTPException(status_code=400, detail="Tipo de venda invalido.")
+    if entrega_tipo not in {"INSTALACAO_COMPLETA", "ATIVACAO_TRIAL"}:
+        raise HTTPException(status_code=400, detail="Tipo de entrega invalido.")
     implantacao = date.fromisoformat(data_implantacao)
     vencimento = implantacao + timedelta(days=dias_validade)
     agora = datetime.now().isoformat(timespec="seconds")
@@ -228,8 +295,8 @@ def criar_venda(
             """
             INSERT INTO vendas (
                 cliente_nome, cliente_email, documento, telefone, ambiente, tipo, status, valor,
-                data_venda, data_implantacao, data_vencimento, observacoes, criado_em, atualizado_em
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                data_venda, data_implantacao, data_vencimento, observacoes, entrega_tipo, criado_em, atualizado_em
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 cliente_nome.strip(),
@@ -238,18 +305,20 @@ def criar_venda(
                 telefone.strip(),
                 ambiente.strip(),
                 tipo,
-                "CADASTRADO",
+                "ATIVO" if tipo == "TRIAL" else "AGUARDANDO_PIX",
                 valor,
                 hoje_iso(),
                 implantacao.isoformat(),
                 vencimento.isoformat(),
                 observacoes.strip(),
+                entrega_tipo,
                 agora,
                 agora,
             ),
         )
         venda_id = cursor.lastrowid
-    salvar_licenca(venda_id, tipo, dias_validade)
+    if tipo == "TRIAL":
+        salvar_licenca(venda_id, tipo, dias_validade)
     return RedirectResponse("/", status_code=303)
 
 
@@ -265,7 +334,21 @@ def renovar(venda_id: int):
         raise HTTPException(status_code=404, detail="Venda nao encontrada.")
     vencimento_atual = date.fromisoformat(venda["data_vencimento"])
     data_base = max(vencimento_atual, date.today()).isoformat()
+    with get_conn() as conn:
+        conn.execute("UPDATE vendas SET entrega_tipo = 'ATIVACAO_TRIAL' WHERE id = ?", (venda_id,))
     salvar_licenca(venda_id, "PAGO", 365, data_base=data_base)
+    return RedirectResponse("/", status_code=303)
+
+
+@app.post("/vendas/{venda_id}/confirmar-pix")
+def confirmar_pix(venda_id: int):
+    with get_conn() as conn:
+        venda = row_to_dict(conn.execute("SELECT status FROM vendas WHERE id = ?", (venda_id,)).fetchone())
+    if not venda:
+        raise HTTPException(status_code=404, detail="Venda nao encontrada.")
+    if venda["status"] != "AGUARDANDO_PIX":
+        raise HTTPException(status_code=400, detail="Esta venda nao esta aguardando confirmacao de PIX.")
+    salvar_licenca(venda_id, "PAGO", 365, data_base=date.today().isoformat())
     return RedirectResponse("/", status_code=303)
 
 

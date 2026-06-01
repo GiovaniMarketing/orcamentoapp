@@ -1,53 +1,73 @@
-# OrcamentoApp - Fluxo comercial ponto a ponto
+# App Orcamento Familiar - Fluxo comercial ponto a ponto
 
 ## Pastas principais
 
-- `dist`: sua versão interna atualizada.
-- `trial`: pacote de teste para o cliente, com licença obrigatória de 7 dias.
-- `pacotes_clientes`: pacotes gerados pelo Admin de Vendas para cada cliente real.
-- `backups`: cópias de segurança de bancos importantes.
+- `base_cliente`: base interna reutilizavel para montar entregas. Nao enviar diretamente.
+- `pacotes_clientes`: pastas e arquivos ZIP exclusivos gerados para cada cliente.
+- `backups`: copias de seguranca de bancos importantes.
 
-## Como entregar trial
+## Preparar a base cliente
 
-Envie `OrcamentoApp_TRIAL.zip` ao cliente.
+Depois de gerar o executavel cliente, execute:
 
-O cliente deve extrair o ZIP em uma pasta própria e executar `OrcamentoApp.exe`.
-Os dados do teste ficam no `budget_app.db` dentro da pasta extraída.
-Esta mesma instalação trial pode ser ativada depois com uma licença anual, sem trocar o aplicativo nem perder os dados.
+`venv_app\Scripts\python.exe criar_pasta_trial.py --somente-base`
 
-## Como registrar venda e gerar licença anual
+Isso cria `base_cliente`, usada internamente pelo Admin de Vendas.
 
-Execute `abrir_admin_vendas.bat`.
+## Trial por 7 dias
 
-No painel:
+1. Execute `abrir_admin_vendas.bat`.
+2. Cadastre o cliente com tipo `TRIAL`.
+3. O painel gera uma pasta exclusiva, como `0001_joao_simone_trial`, e o ZIP correspondente.
+4. Envie o ZIP ao cliente.
 
-1. Cadastre os dados do cliente.
-2. Informe a data de implantação.
-3. Para venda anual, use tipo `PAGO` e `365` dias de validade.
-4. Baixe o pacote gerado ou envie apenas o novo `license.key` para substituir o trial.
-5. O cliente deve fechar o app, substituir `license.key` e abrir novamente.
+Os dados do teste ficam em `budget_app.db` dentro da pasta extraida pelo cliente.
 
-## Renovação
+## Venda direta
 
-No Admin de Vendas, use `Renovar 1 ano`.
+1. Informe o PIX ao cliente.
+2. Confira o recebimento no extrato do Mercado Pago.
+3. No painel, cadastre o cliente com tipo `PAGO`.
+4. Escolha `Instalacao completa`.
+5. O cadastro fica com status `AGUARDANDO_PIX`.
+6. Clique em `Confirmar PIX e gerar licenca` somente depois de conferir o pagamento.
+7. Envie o ZIP da pasta exclusiva, como `0002_joao_simone_vendido`.
 
-Isso gera uma nova licença paga por 365 dias com base na data de implantação registrada.
+## Ativacao de cliente que ja usou o trial
 
-## Sugestões para profissionalizar ainda mais
+1. Confira o PIX no extrato do Mercado Pago.
+2. Cadastre uma venda `PAGO`.
+3. Escolha `Cliente ja possui trial: somente licenca`.
+4. Clique em `Confirmar PIX e gerar licenca`.
+5. Envie o ZIP da pasta exclusiva, como `0003_joao_simone_ativacao`.
 
-- Assinatura de contrato simples com cliente, CPF/CNPJ, ambiente instalado e política de backup.
-- Backup automático do `budget_app.db` antes de cada atualização.
-- Instalador Windows com atalho na área de trabalho.
-- Versão do app exibida no rodapé e gravada em log para suporte.
-- Exportação de backup/importação restaurável direto pelo painel.
-- Termo de uso dentro do pacote trial.
+Essa pasta contem somente `license.key` e instrucoes. O cliente deve:
 
-## Licenciamento técnico
+1. Fechar o aplicativo.
+2. Fazer backup de `budget_app.db`.
+3. Substituir somente `license.key`.
+4. Abrir novamente o aplicativo.
 
-A versão cliente/trial usa PySide6 em vez de PyQt6.
-Mantenha os avisos de bibliotecas na pasta `licenses` do pacote distribuído.
+Os dados cadastrados durante o trial permanecem preservados.
 
-## Recursos incluidos na versao cliente
+## Renovacao anual
+
+Depois de conferir o PIX de renovacao, localize o cliente ativo e clique em `Confirmar PIX e renovar 1 ano`.
+O painel gera uma nova licenca anual.
+
+## Cuidados comerciais
+
+- Nunca liberar licenca paga somente com base em comprovante enviado pelo cliente.
+- Confirmar o recebimento diretamente no extrato do Mercado Pago.
+- Registrar a confirmacao do PIX nas observacoes comerciais.
+- Manter backup do banco administrativo `admin_vendas.db`.
+
+## Licenciamento tecnico
+
+A versao cliente usa PySide6 em vez de PyQt6.
+Mantenha os avisos de bibliotecas na pasta `licenses` do pacote distribuido.
+
+## Recursos incluidos
 
 - Status de licenca no painel.
 - Backup manual do banco local.

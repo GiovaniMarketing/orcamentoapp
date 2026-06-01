@@ -15,6 +15,7 @@ build_*/
 dist/
 dist_*/
 trial/
+base_cliente/
 TRIAL_ENVIAR_CLIENTE/
 pacotes_clientes/
 *.spec.bak
