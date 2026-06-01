@@ -99,8 +99,8 @@ draw.rounded_rectangle((62, box_y, 560, 1320), radius=8, fill=(255, 255, 255, 24
 draw.text((84, box_y + 18), "Teste gratuitamente por 7 dias", font=font(25, True), fill="#087b7a")
 draw.text((84, box_y + 58), "Conheca o aplicativo antes de contratar", font=font(18, True), fill="#345f60")
 draw.text((84, box_y + 83), "sua licença anual.", font=font(18, True), fill="#345f60")
-draw.text((84, box_y + 115), "Licença anual:", font=font(19, True), fill="#153f40")
-draw.text((222, box_y + 105), "R$ 999,00", font=font(31, True), fill="#087b7a")
+draw.text((84, box_y + 110), "Oferta de lançamento: R$ 197,00", font=font(19, True), fill="#087b7a")
+draw.text((84, box_y + 137), "Renovação anual: R$ 297,00", font=font(16, True), fill="#345f60")
 
 contact_y = 1186
 draw.rounded_rectangle((627, contact_y, 1042, 1320), radius=8, fill="#087b7a")
