@@ -22,6 +22,7 @@ Aplicativo local para controle financeiro familiar, com receitas, despesas, inve
 - `licenciamento.py`: geracao e validacao de licencas.
 - `criar_pasta_trial.py`: prepara a base reutilizavel do aplicativo cliente.
 - `base_cliente`: base local ignorada pelo Git, usada para gerar entregas exclusivas.
+- `E:\App Orcamento Familiar Comercial\pacotes_temporarios`: armazenamento externo temporario dos pacotes gerados.
 - `templates/` e `static/`: painel web local carregado pelo app desktop.
 
 ## Arquivos gerados
@@ -39,3 +40,5 @@ O Admin de Vendas gera pastas exclusivas com ID e nome do cliente:
 - `0003_joao_simone_ativacao`: somente `license.key` para ativar trial ou renovar.
 
 Vendas pagas ficam com status `AGUARDANDO_PIX`. A licenca anual so e gerada depois da confirmacao manual do pagamento no extrato.
+
+Depois de enviar um pacote, use `Excluir apos envio` no Admin de Vendas. O painel preserva a licenca no banco e permite `Gerar novamente` quando necessario. Pacotes temporarios com mais de 15 dias sao removidos automaticamente.

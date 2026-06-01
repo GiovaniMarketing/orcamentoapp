@@ -3,7 +3,7 @@
 ## Pastas principais
 
 - `base_cliente`: base interna reutilizavel para montar entregas. Nao enviar diretamente.
-- `pacotes_clientes`: pastas e arquivos ZIP exclusivos gerados para cada cliente.
+- `E:\App Orcamento Familiar Comercial\pacotes_temporarios`: pastas e ZIPs exclusivos gerados temporariamente para cada cliente.
 - `backups`: copias de seguranca de bancos importantes.
 
 ## Preparar a base cliente
@@ -23,6 +23,9 @@ Isso cria `base_cliente`, usada internamente pelo Admin de Vendas.
 
 Os dados do teste ficam em `budget_app.db` dentro da pasta extraida pelo cliente.
 
+Depois de enviar o ZIP, use `Excluir apos envio`. O cadastro e a licenca continuam no banco administrativo.
+Se precisar reenviar, use `Gerar novamente`.
+
 ## Venda direta
 
 1. Informe o PIX ao cliente.
@@ -32,6 +35,7 @@ Os dados do teste ficam em `budget_app.db` dentro da pasta extraida pelo cliente
 5. O cadastro fica com status `AGUARDANDO_PIX`.
 6. Clique em `Confirmar PIX e gerar licenca` somente depois de conferir o pagamento.
 7. Envie o ZIP da pasta exclusiva, como `0002_joao_simone_vendido`.
+8. Depois do envio, use `Excluir apos envio` para liberar espaco.
 
 ## Ativacao de cliente que ja usou o trial
 
@@ -49,6 +53,21 @@ Essa pasta contem somente `license.key` e instrucoes. O cliente deve:
 4. Abrir novamente o aplicativo.
 
 Os dados cadastrados durante o trial permanecem preservados.
+
+## Espaco em disco
+
+Os pacotes ficam fora do projeto em:
+
+`E:\App Orcamento Familiar Comercial\pacotes_temporarios`
+
+Pacotes completos ocupam aproximadamente 210 MB antes de compactar e devem ser apagados depois do envio.
+O painel mostra o espaco ocupado e oferece:
+
+- `Excluir apos envio`
+- `Gerar novamente`
+- `Excluir pacotes com mais de 15 dias`
+
+Ao abrir o Admin de Vendas, pacotes temporarios com mais de 15 dias tambem sao removidos automaticamente.
 
 ## Renovacao anual
 

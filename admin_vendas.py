@@ -3,6 +3,7 @@ import sqlite3
 import zipfile
 from datetime import date, datetime, timedelta
 from html import escape
+import os
 from pathlib import Path
 
 import uvicorn
@@ -14,8 +15,10 @@ from licenciamento import gerar_licenca
 
 BASE_PATH = Path(__file__).resolve().parent
 ADMIN_DB = BASE_PATH / "admin_vendas.db"
-PACOTES_DIR = BASE_PATH / "pacotes_clientes"
+COMERCIAL_DIR = Path(os.getenv("ORCAMENTOAPP_COMERCIAL_DIR", r"E:\App Orcamento Familiar Comercial"))
+PACOTES_DIR = COMERCIAL_DIR / "pacotes_temporarios"
 BASE_CLIENTE_DIR = BASE_PATH / "base_cliente"
+RETENCAO_PACOTES_DIAS = 15
 
 app = FastAPI(title="OrcamentoApp - Admin de Vendas")
 
@@ -27,7 +30,7 @@ def get_conn():
 
 
 def init_db():
-    PACOTES_DIR.mkdir(exist_ok=True)
+    PACOTES_DIR.mkdir(parents=True, exist_ok=True)
     with get_conn() as conn:
         conn.execute(
             """
@@ -73,6 +76,51 @@ def nome_seguro(texto: str) -> str:
     return "".join(c if c.isalnum() or c in ["-", "_"] else "_" for c in texto.strip()) or "cliente"
 
 
+def remover_caminho_controlado(caminho: str | Path | None):
+    if not caminho:
+        return
+    path = Path(caminho)
+    if not path.exists():
+        return
+    root = PACOTES_DIR.resolve()
+    resolved = path.resolve()
+    if resolved != root and root not in resolved.parents:
+        raise RuntimeError(f"Caminho fora da pasta temporaria: {resolved}")
+    if resolved.is_dir():
+        shutil.rmtree(resolved)
+    else:
+        resolved.unlink()
+
+
+def tamanho_pasta(caminho: Path) -> int:
+    if not caminho.exists():
+        return 0
+    return sum(arquivo.stat().st_size for arquivo in caminho.rglob("*") if arquivo.is_file())
+
+
+def formatar_tamanho(bytes_total: int) -> str:
+    if bytes_total >= 1024 ** 3:
+        return f"{bytes_total / (1024 ** 3):.2f} GB"
+    if bytes_total >= 1024 ** 2:
+        return f"{bytes_total / (1024 ** 2):.2f} MB"
+    if bytes_total >= 1024:
+        return f"{bytes_total / 1024:.2f} KB"
+    return f"{bytes_total} bytes"
+
+
+def limpar_pacotes_antigos(dias: int = RETENCAO_PACOTES_DIAS) -> int:
+    limite = datetime.now() - timedelta(days=dias)
+    removidos = 0
+    if not PACOTES_DIR.exists():
+        return removidos
+    for item in PACOTES_DIR.iterdir():
+        modificado_em = datetime.fromtimestamp(item.stat().st_mtime)
+        if modificado_em < limite:
+            remover_caminho_controlado(item)
+            removidos += 1
+    return removidos
+
+
 def criar_zip(pasta: Path) -> Path:
     zip_path = pasta.with_suffix(".zip")
     if zip_path.exists():
@@ -91,7 +139,7 @@ def criar_pacote_cliente(venda: dict, conteudo_licenca: str, tipo: str) -> tuple
     work_dir = PACOTES_DIR / nome_base
 
     if work_dir.exists():
-        shutil.rmtree(work_dir)
+        remover_caminho_controlado(work_dir)
     if entrega_tipo == "ATIVACAO_TRIAL" and tipo.upper() != "TRIAL":
         work_dir.mkdir(parents=True)
     else:
@@ -156,9 +204,41 @@ def listar_vendas():
         return [dict(row) for row in conn.execute("SELECT * FROM vendas ORDER BY data_vencimento ASC, id DESC").fetchall()]
 
 
+def regerar_pacote(venda_id: int) -> dict:
+    with get_conn() as conn:
+        venda = row_to_dict(conn.execute("SELECT * FROM vendas WHERE id = ?", (venda_id,)).fetchone())
+    if not venda:
+        raise HTTPException(status_code=404, detail="Venda nao encontrada.")
+    if not venda.get("licenca_atual"):
+        raise HTTPException(status_code=400, detail="Esta venda ainda nao possui licenca gerada.")
+    pasta_pacote, zip_path = criar_pacote_cliente(venda, venda["licenca_atual"], venda["tipo"])
+    agora = datetime.now().isoformat(timespec="seconds")
+    with get_conn() as conn:
+        conn.execute(
+            "UPDATE vendas SET pasta_pacote = ?, pacote_zip = ?, atualizado_em = ? WHERE id = ?",
+            (str(pasta_pacote), str(zip_path), agora, venda_id),
+        )
+    return {"pasta_pacote": pasta_pacote, "zip_path": zip_path}
+
+
+def excluir_pacote(venda_id: int):
+    with get_conn() as conn:
+        venda = row_to_dict(conn.execute("SELECT pasta_pacote, pacote_zip FROM vendas WHERE id = ?", (venda_id,)).fetchone())
+    if not venda:
+        raise HTTPException(status_code=404, detail="Venda nao encontrada.")
+    remover_caminho_controlado(venda.get("pasta_pacote"))
+    remover_caminho_controlado(venda.get("pacote_zip"))
+    with get_conn() as conn:
+        conn.execute(
+            "UPDATE vendas SET pasta_pacote = NULL, pacote_zip = NULL, atualizado_em = ? WHERE id = ?",
+            (datetime.now().isoformat(timespec="seconds"), venda_id),
+        )
+
+
 def html_page() -> str:
     vendas = listar_vendas()
     hoje = date.today()
+    uso_pacotes = tamanho_pasta(PACOTES_DIR)
     linhas = []
     for venda in vendas:
         venc = date.fromisoformat(venda["data_vencimento"])
@@ -167,6 +247,19 @@ def html_page() -> str:
         pacote = ""
         if venda.get("pacote_zip") and Path(venda["pacote_zip"]).exists():
             pacote = f'<a href="/download/{venda["id"]}">baixar pacote</a>'
+            pacote += f"""
+                <form method="post" action="/vendas/{venda['id']}/excluir-pacote">
+                    <button class="secundario">Excluir apos envio</button>
+                </form>
+            """
+        elif venda.get("licenca_atual"):
+            pacote = f"""
+                <form method="post" action="/vendas/{venda['id']}/regerar-pacote">
+                    <button class="secundario">Gerar novamente</button>
+                </form>
+            """
+        else:
+            pacote = "<small>Ainda nao gerado</small>"
         if venda["status"] == "AGUARDANDO_PIX":
             acao = f"""
                 <form method="post" action="/vendas/{venda['id']}/confirmar-pix">
@@ -215,6 +308,7 @@ def html_page() -> str:
             input, select, textarea {{ width: 100%; box-sizing: border-box; padding: 9px; border: 1px solid #cfd6e0; border-radius: 6px; }}
             textarea {{ grid-column: 1 / -1; min-height: 70px; }}
             button {{ background: #2457c5; color: white; border: 0; border-radius: 6px; padding: 9px 12px; cursor: pointer; font-weight: 700; }}
+            button.secundario {{ background: #5f6b7a; margin-top: 6px; }}
             table {{ width: 100%; border-collapse: collapse; }}
             th, td {{ padding: 10px; border-bottom: 1px solid #edf0f4; text-align: left; vertical-align: top; }}
             th {{ font-size: 12px; text-transform: uppercase; color: #5c6675; }}
@@ -228,6 +322,15 @@ def html_page() -> str:
     </head>
     <body><main>
         <h1>Admin de Vendas - OrcamentoApp</h1>
+        <section>
+            <h2>Armazenamento temporario</h2>
+            <p><strong>Pasta:</strong> {escape(str(PACOTES_DIR))}</p>
+            <p><strong>Espaco ocupado:</strong> {formatar_tamanho(uso_pacotes)}</p>
+            <p class="nota">Pacotes completos sao temporarios. Depois de enviar ao cliente, use Excluir apos envio. Licencas e dados comerciais continuam registrados no banco administrativo.</p>
+            <form method="post" action="/limpar-pacotes-antigos">
+                <button class="secundario">Excluir pacotes com mais de {RETENCAO_PACOTES_DIAS} dias</button>
+            </form>
+        </section>
         <section>
             <h2>Novo trial ou venda</h2>
             <p class="nota">TRIAL gera pacote completo por 7 dias. PAGO fica aguardando PIX e so gera a entrega depois da confirmacao no extrato.</p>
@@ -361,6 +464,25 @@ def download(venda_id: int):
     return FileResponse(venda["pacote_zip"], filename=Path(venda["pacote_zip"]).name)
 
 
+@app.post("/vendas/{venda_id}/excluir-pacote")
+def excluir_pacote_rota(venda_id: int):
+    excluir_pacote(venda_id)
+    return RedirectResponse("/", status_code=303)
+
+
+@app.post("/vendas/{venda_id}/regerar-pacote")
+def regerar_pacote_rota(venda_id: int):
+    regerar_pacote(venda_id)
+    return RedirectResponse("/", status_code=303)
+
+
+@app.post("/limpar-pacotes-antigos")
+def limpar_pacotes_antigos_rota():
+    limpar_pacotes_antigos()
+    return RedirectResponse("/", status_code=303)
+
+
 if __name__ == "__main__":
     init_db()
+    limpar_pacotes_antigos()
     uvicorn.run(app, host="127.0.0.1", port=8020)
