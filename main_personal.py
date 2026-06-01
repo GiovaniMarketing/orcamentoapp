@@ -11,6 +11,8 @@ import io
 import socket
 import shutil
 import re
+from html import escape
+from calendar import monthrange
 from logging.handlers import RotatingFileHandler
 import multiprocessing
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
@@ -1061,27 +1063,88 @@ def db_get_alertas(ano: int, mes: int) -> dict:
     finally:
         if conn: conn.close()
 
-def gerar_relatorio_mensal_html(ano: int, mes: int) -> str:
-    saldo = db_get_saldo_atual() or {}
-    analise = db_get_analise_despesas(ano, mes) or {"analise_por_categoria": [], "total_receitas": 0, "total_despesas": 0}
-    alertas = db_get_alertas(ano, mes)
+def gerar_relatorio_periodo_html(ano: int, tipo: str, mes: int | None = None, semestre: int | None = None) -> str:
+    if tipo == "mensal":
+        if mes is None or mes < 1 or mes > 12:
+            raise ValueError("Mes invalido.")
+        inicio, fim = f"{ano}-{mes:02d}-01", f"{ano}-{mes:02d}-{monthrange(ano, mes)[1]:02d}"
+        titulo = f"Relatorio mensal - {mes:02d}/{ano}"
+    elif tipo == "semestral":
+        if semestre not in {1, 2}:
+            raise ValueError("Semestre invalido.")
+        inicio = f"{ano}-{'01' if semestre == 1 else '07'}-01"
+        fim = f"{ano}-{'06-30' if semestre == 1 else '12-31'}"
+        titulo = f"Relatorio semestral - {semestre}o semestre/{ano}"
+    elif tipo == "anual":
+        inicio, fim = f"{ano}-01-01", f"{ano}-12-31"
+        titulo = f"Relatorio anual - {ano}"
+    else:
+        raise ValueError("Tipo de relatorio invalido.")
+
+    conn = get_db_conn()
+    if not conn:
+        raise RuntimeError("Nao foi possivel acessar o banco de dados.")
+    try:
+        cursor = conn.cursor()
+        transacoes = []
+        for tabela, rotulo in [("receitas", "Receita"), ("despesas", "Despesa")]:
+            cursor.execute(
+                f"""SELECT descricao, valor, pago, categoria, data, data_vencimento
+                    FROM {tabela}
+                    WHERE date(COALESCE(data_vencimento, data)) BETWEEN date(?) AND date(?)
+                    ORDER BY date(COALESCE(data_vencimento, data)), id""",
+                (inicio, fim),
+            )
+            for row in cursor.fetchall():
+                item = dict(row)
+                item["tipo"] = rotulo
+                transacoes.append(item)
+    finally:
+        conn.close()
+
+    transacoes.sort(key=lambda item: item.get("data_vencimento") or item.get("data") or "")
+    totais = {
+        "receitas": sum(float(item["valor"]) for item in transacoes if item["tipo"] == "Receita"),
+        "despesas": sum(float(item["valor"]) for item in transacoes if item["tipo"] == "Despesa"),
+        "receitas_confirmadas": sum(float(item["valor"]) for item in transacoes if item["tipo"] == "Receita" and item["pago"]),
+        "despesas_confirmadas": sum(float(item["valor"]) for item in transacoes if item["tipo"] == "Despesa" and item["pago"]),
+    }
+    categorias = {}
+    for item in transacoes:
+        if item["tipo"] == "Despesa":
+            categoria = item.get("categoria") or "Sem categoria"
+            categorias[categoria] = categorias.get(categoria, 0) + float(item["valor"])
+
+    def moeda(valor: float) -> str:
+        return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
     linhas = "".join(
-        f"<tr><td>{item['categoria']}</td><td>R$ {item['total']:.2f}</td><td>{item['percentual_da_receita']}%</td></tr>"
-        for item in analise["analise_por_categoria"]
-    )
-    vencendo = "".join(
-        f"<li>{item['descricao']} - R$ {item['valor']:.2f} - {item.get('data_vencimento') or '-'}</li>"
-        for item in alertas.get("contas_vencendo_7_dias", [])
-    ) or "<li>Nenhuma conta vencendo nos proximos 7 dias.</li>"
-    return f"""<!doctype html><html><head><meta charset='utf-8'><title>Relatorio mensal</title>
-    <style>body{{font-family:Arial,sans-serif;margin:32px;color:#243041}}h1{{color:#2457c5}}table{{border-collapse:collapse;width:100%}}td,th{{border-bottom:1px solid #ddd;padding:8px;text-align:left}}.box{{background:#f4f6f8;padding:12px;margin:10px 0}}</style></head>
-    <body><h1>App Orcamento Familiar - Relatorio {mes:02d}/{ano}</h1>
-    <div class='box'><strong>Saldo real:</strong> R$ {saldo.get('saldo_real_confirmado', 0):.2f}<br>
-    <strong>Receitas:</strong> R$ {analise['total_receitas']:.2f}<br>
-    <strong>Despesas:</strong> R$ {analise['total_despesas']:.2f}<br>
-    <strong>Sobra prevista:</strong> R$ {alertas.get('sobra_prevista_mes', 0):.2f}</div>
-    <h2>Despesas por categoria</h2><table><tr><th>Categoria</th><th>Total</th><th>% da receita</th></tr>{linhas}</table>
-    <h2>Contas a vencer</h2><ul>{vencendo}</ul>
+        "<tr>"
+        f"<td>{escape(str(item.get('data_vencimento') or item.get('data') or '-'))[:10]}</td>"
+        f"<td>{item['tipo']}</td>"
+        f"<td>{escape(str(item.get('descricao') or '-'))}</td>"
+        f"<td>{escape(str(item.get('categoria') or 'Sem categoria'))}</td>"
+        f"<td>{'Confirmado' if item.get('pago') else 'Pendente'}</td>"
+        f"<td>{moeda(float(item['valor']))}</td>"
+        "</tr>"
+        for item in transacoes
+    ) or "<tr><td colspan='6'>Nenhum lancamento neste periodo.</td></tr>"
+    linhas_categorias = "".join(
+        f"<tr><td>{escape(categoria)}</td><td>{moeda(total)}</td></tr>"
+        for categoria, total in sorted(categorias.items(), key=lambda item: item[1], reverse=True)
+    ) or "<tr><td colspan='2'>Nenhuma despesa neste periodo.</td></tr>"
+    saldo_periodo = totais["receitas"] - totais["despesas"]
+
+    return f"""<!doctype html><html><head><meta charset='utf-8'><title>{titulo}</title>
+    <style>body{{font-family:Arial,sans-serif;margin:32px;color:#243041}}h1{{color:#2457c5}}table{{border-collapse:collapse;width:100%;margin-bottom:24px}}td,th{{border-bottom:1px solid #ddd;padding:8px;text-align:left}}.box{{background:#f4f6f8;padding:14px;margin:10px 0 22px;line-height:1.7}}button{{background:#2457c5;color:#fff;border:0;padding:10px 14px;border-radius:6px;font-weight:700;cursor:pointer}}@media print{{button{{display:none}}}}</style></head>
+    <body><button onclick='history.back()'>Voltar ao painel</button> <button onclick='window.print()'>Imprimir ou salvar em PDF</button>
+    <h1>App Orcamento Familiar - {titulo}</h1>
+    <div class='box'><strong>Periodo:</strong> {inicio} a {fim}<br>
+    <strong>Receitas:</strong> {moeda(totais['receitas'])} | <strong>Confirmadas:</strong> {moeda(totais['receitas_confirmadas'])}<br>
+    <strong>Despesas:</strong> {moeda(totais['despesas'])} | <strong>Confirmadas:</strong> {moeda(totais['despesas_confirmadas'])}<br>
+    <strong>Saldo do periodo:</strong> {moeda(saldo_periodo)}</div>
+    <h2>Despesas por categoria</h2><table><tr><th>Categoria</th><th>Total</th></tr>{linhas_categorias}</table>
+    <h2>Lancamentos do periodo</h2><table><tr><th>Data</th><th>Tipo</th><th>Descricao</th><th>Categoria</th><th>Status</th><th>Valor</th></tr>{linhas}</table>
     <p>Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')}.</p></body></html>"""
 
 # ============================================================
@@ -1395,10 +1458,23 @@ def create_fastapi_app() -> FastAPI:
         ano: int = Query(..., ge=2000, le=2100),
         mes: int = Query(..., ge=1, le=12)
     ):
-        html = gerar_relatorio_mensal_html(ano, mes)
+        html = gerar_relatorio_periodo_html(ano, "mensal", mes=mes)
         response = Response(content=html.encode("utf-8"), media_type="text/html")
         response.headers["Content-Disposition"] = f"attachment; filename=Relatorio_Mensal_{ano}_{mes:02d}.html"
         return response
+
+    @api_router.get("/relatorio/periodo")
+    async def exportar_relatorio_periodo(
+        ano: int = Query(..., ge=2000, le=2100),
+        tipo: Literal["mensal", "semestral", "anual"] = Query(...),
+        mes: Optional[int] = Query(None, ge=1, le=12),
+        semestre: Optional[int] = Query(None, ge=1, le=2),
+    ):
+        try:
+            html = gerar_relatorio_periodo_html(ano, tipo, mes=mes, semestre=semestre)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        return HTMLResponse(content=html)
 
     @api_router.post("/backup/criar", response_model=Dict[str, Any])
     async def criar_backup():

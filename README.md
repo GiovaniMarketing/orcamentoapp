@@ -9,7 +9,7 @@ Aplicativo local para controle financeiro familiar, com receitas, despesas, inve
 - Metas financeiras com progresso.
 - Importacao opcional de extratos `.csv` e `.ofx`.
 - Backup local do banco `budget_app.db`.
-- Relatorio mensal em HTML imprimivel/salvavel em PDF pelo navegador.
+- Relatorios mensal, semestral e anual em HTML imprimivel/salvavel em PDF.
 - Exportacao anual para apoio na declaracao de imposto de renda.
 - Modo privacidade para ocultar valores na tela.
 - Status de licenca visivel no painel.

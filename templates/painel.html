@@ -93,6 +93,10 @@
         .tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.6rem; }
         .tool-grid button, .tool-grid label { width: 100%; background: var(--cor-primaria); color: white; border-radius: 6px; padding: 0.65rem; text-align: center; box-sizing: border-box; cursor: pointer; font-weight: 700; font-size: 0.85rem; }
         .tool-grid input[type="file"] { display: none; }
+        .relatorio-controls { margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid #dbe1ea; display: flex; gap: 0.55rem; align-items: center; flex-wrap: wrap; }
+        .relatorio-controls select { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; }
+        .relatorio-controls input { width: 92px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; }
+        .relatorio-controls button { width: auto; padding: 0.55rem 0.85rem; }
         .alerta-lista, .metas-lista { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
         .alerta-lista li, .metas-lista li { background: var(--cor-fundo); border-radius: 6px; padding: 0.65rem; font-size: 0.86rem; }
         .meta-barra { height: 8px; background: #dbe1ea; border-radius: 99px; overflow: hidden; margin-top: 0.45rem; }
@@ -266,12 +270,26 @@
                 <h2>Ferramentas</h2>
                 <div class="tool-grid">
                     <button type="button" onclick="criarBackup()">Backup</button>
-                    <button type="button" onclick="baixarRelatorioMensal()">Relatorio Mensal</button>
                     <button type="button" onclick="alternarPrivacidade()">Privacidade</button>
                     <button type="button" onclick="mostrarSobre()">Sobre</button>
                     <label for="arquivo-extrato">Importar Extrato</label>
                     <input type="file" id="arquivo-extrato" accept=".csv,.ofx">
                 </div>
+                <form class="relatorio-controls" action="/api/relatorio/periodo" method="get">
+                    <label for="relatorio-periodo">Relatorio:</label>
+                    <select id="relatorio-periodo" name="tipo" onchange="atualizarControlesRelatorio()">
+                        <option value="mensal">Mensal</option>
+                        <option value="semestral">Semestral</option>
+                        <option value="anual">Anual</option>
+                    </select>
+                    <select id="relatorio-mes" name="mes"></select>
+                    <select id="relatorio-semestre" name="semestre" style="display:none" disabled>
+                        <option value="1">1o semestre</option>
+                        <option value="2">2o semestre</option>
+                    </select>
+                    <input type="number" id="relatorio-ano" name="ano" min="2000" max="2100" required>
+                    <button type="submit">Abrir Relatorio</button>
+                </form>
                 <p id="ferramentas-status" class="loading-placeholder" style="margin-bottom: 0;"></p>
             </div>
 
@@ -786,20 +804,14 @@
         }
     }
 
-    async function baixarRelatorioMensal() {
-        const mes = document.getElementById('mes-analise').value;
-        const ano = document.getElementById('ano-analise').value;
-        const response = await fetch(`${API_URL}/api/relatorio/mensal?ano=${ano}&mes=${mes}`);
-        if (!response.ok) return alert("Erro ao gerar relatorio mensal.");
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Relatorio_Mensal_${ano}_${String(mes).padStart(2, '0')}.html`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
+    function atualizarControlesRelatorio() {
+        const tipo = document.getElementById('relatorio-periodo').value;
+        const mes = document.getElementById('relatorio-mes');
+        const semestre = document.getElementById('relatorio-semestre');
+        mes.style.display = tipo === 'mensal' ? '' : 'none';
+        mes.disabled = tipo !== 'mensal';
+        semestre.style.display = tipo === 'semestral' ? '' : 'none';
+        semestre.disabled = tipo !== 'semestral';
     }
 
     function alternarPrivacidade() {
@@ -1133,20 +1145,26 @@
         const mesSelect = document.getElementById('mes-analise');
         const anoInput = document.getElementById('ano-analise');
         const anoIrInput = document.getElementById('ano-ir');
+        const relatorioAnoInput = document.getElementById('relatorio-ano');
+        const relatorioMesSelect = document.getElementById('relatorio-mes');
         const hoje = new Date();
         const anoAtual = hoje.getFullYear();
         const mesAtual = hoje.getMonth() + 1;
         const nomesMeses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
         mesSelect.innerHTML = '';
+        relatorioMesSelect.innerHTML = '';
         for (let i = 0; i < 12; i++) {
             const option = document.createElement('option');
             option.value = i + 1;
             option.textContent = nomesMeses[i];
             if (i + 1 === mesAtual) option.selected = true;
             mesSelect.appendChild(option);
+            relatorioMesSelect.appendChild(option.cloneNode(true));
         }
         anoInput.value = anoAtual;
         if (anoIrInput) anoIrInput.value = anoAtual;
+        relatorioAnoInput.value = anoAtual;
+        atualizarControlesRelatorio();
     }
 
     // --- Inicialização da Página ---

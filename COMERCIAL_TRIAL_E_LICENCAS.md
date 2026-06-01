@@ -95,5 +95,5 @@ Mantenha os avisos de bibliotecas na pasta `licenses` do pacote distribuido.
 - Alertas de contas a vencer e sobra prevista.
 - Metas financeiras.
 - Importacao opcional de extrato CSV/OFX.
-- Relatorio mensal em HTML imprimivel.
+- Relatorios mensal, semestral e anual em HTML imprimivel.
 - Modo privacidade para ocultar valores na tela.
