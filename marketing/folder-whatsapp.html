@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Folder App Orcamento Familiar</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 1080px; height: 1350px; overflow: hidden; font-family: Arial, Helvetica, sans-serif; }
+    body { background: #f6fbfa; color: #123436; }
+    .folder { position: relative; width: 1080px; height: 1350px; overflow: hidden; background: #f6fbfa; }
+    .photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .wash { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(246,251,250,.99) 0%, rgba(246,251,250,.97) 43%, rgba(246,251,250,.68) 70%, rgba(246,251,250,.18) 100%); }
+    .topbar { position: absolute; left: 0; top: 0; right: 0; height: 18px; background: #087b7a; }
+    .content { position: absolute; inset: 0; padding: 66px 62px 44px; display: flex; flex-direction: column; }
+    .brand { display: flex; align-items: center; gap: 17px; }
+    .brand img { width: 76px; height: 76px; border-radius: 14px; box-shadow: 0 6px 18px rgba(18,52,54,.16); }
+    .brand-name { font-size: 30px; font-weight: 800; color: #14595a; }
+    .brand-note { margin-top: 4px; color: #496d6e; font-size: 17px; font-weight: 700; }
+    h1 { margin: 62px 0 18px; width: 670px; color: #123436; font-size: 68px; line-height: 1.03; letter-spacing: 0; }
+    .intro { width: 610px; margin: 0; color: #355b5c; font-size: 25px; line-height: 1.35; font-weight: 600; }
+    .features { width: 610px; margin: 43px 0 0; padding: 0; list-style: none; display: grid; gap: 17px; }
+    .features li { display: flex; align-items: flex-start; gap: 13px; color: #23494a; font-size: 22px; line-height: 1.25; font-weight: 700; }
+    .check { width: 27px; height: 27px; border-radius: 50%; flex: 0 0 auto; display: grid; place-items: center; color: #fff; background: #087b7a; font-size: 19px; font-weight: 900; }
+    .privacy { width: 620px; margin-top: 38px; padding: 16px 18px; border-left: 6px solid #2e9b66; background: rgba(255,255,255,.84); color: #245354; font-size: 19px; line-height: 1.35; font-weight: 700; }
+    .bottom { margin-top: auto; width: 100%; display: flex; align-items: end; justify-content: space-between; gap: 34px; }
+    .trial { padding: 20px 23px; width: 480px; background: #fff; border: 2px solid #b8d9d6; box-shadow: 0 9px 22px rgba(18,52,54,.12); }
+    .trial-title { color: #087b7a; font-size: 24px; font-weight: 900; }
+    .trial-copy { margin-top: 9px; color: #345f60; font-size: 18px; line-height: 1.35; font-weight: 700; }
+    .price { margin-top: 14px; color: #153f40; font-size: 19px; font-weight: 800; }
+    .price strong { color: #087b7a; font-size: 30px; }
+    .contact { text-align: right; color: #fff; background: #087b7a; padding: 21px 21px 19px; min-width: 385px; box-shadow: 0 9px 22px rgba(18,52,54,.18); }
+    .contact-label { font-size: 19px; font-weight: 800; }
+    .contact-number { margin-top: 5px; font-size: 32px; font-weight: 900; }
+    .contact-note { margin-top: 5px; font-size: 16px; font-weight: 700; }
+    .footer { position: absolute; bottom: 0; left: 0; right: 0; height: 15px; background: #2e9b66; }
+  </style>
+</head>
+<body>
+  <main class="folder">
+    <img class="photo" src="familia-organizando-financas.png" alt="">
+    <div class="wash"></div>
+    <div class="topbar"></div>
+    <section class="content">
+      <header class="brand">
+        <img src="../favicon.ico" alt="Icone App Orcamento Familiar">
+        <div>
+          <div class="brand-name">App Orcamento Familiar</div>
+          <div class="brand-note">Mais clareza para cuidar do seu dinheiro</div>
+        </div>
+      </header>
+
+      <h1>Organize sua vida financeira com praticidade.</h1>
+      <p class="intro">Acompanhe o que entra, controle seus gastos e planeje seus proximos passos com mais tranquilidade.</p>
+
+      <ul class="features">
+        <li><span class="check">✓</span><span>Registre receitas, despesas e contas a vencer</span></li>
+        <li><span class="check">✓</span><span>Crie metas financeiras e acompanhe seu progresso</span></li>
+        <li><span class="check">✓</span><span>Receba alertas e gere relatorios mensais</span></li>
+        <li><span class="check">✓</span><span>Exporte informacoes para apoio ao Imposto de Renda</span></li>
+        <li><span class="check">✓</span><span>Utilize modo privacidade e backup local</span></li>
+      </ul>
+
+      <div class="privacy">Seus dados permanecem armazenados no seu proprio computador.</div>
+
+      <div class="bottom">
+        <div class="trial">
+          <div class="trial-title">Teste gratuitamente por 7 dias</div>
+          <div class="trial-copy">Conheca o aplicativo antes de contratar sua licenca anual.</div>
+          <div class="price">Licenca anual: <strong>R$ 999,00</strong></div>
+        </div>
+        <div class="contact">
+          <div class="contact-label">Solicite sua versao de avaliacao</div>
+          <div class="contact-number">(12) 98162-2085</div>
+          <div class="contact-note">Atendimento pelo WhatsApp</div>
+        </div>
+      </div>
+    </section>
+    <div class="footer"></div>
+  </main>
+</body>
+</html>
