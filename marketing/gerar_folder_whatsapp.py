@@ -105,7 +105,7 @@ draw.text((222, box_y + 105), "R$ 999,00", font=font(31, True), fill="#087b7a")
 contact_y = 1186
 draw.rounded_rectangle((627, contact_y, 1042, 1320), radius=8, fill="#087b7a")
 draw.text((651, contact_y + 19), "Solicite sua versão de avaliação", font=font(19, True), fill="white")
-draw.text((651, contact_y + 52), "(12) 98162-2085", font=font(33, True), fill="white")
+draw.text((651, contact_y + 52), "(12) 98161-2085", font=font(33, True), fill="white")
 draw.text((651, contact_y + 101), "Atendimento pelo WhatsApp", font=font(16, True), fill="white")
 
 canvas.convert("RGB").save(ROOT / "folder-whatsapp.png", quality=96)
