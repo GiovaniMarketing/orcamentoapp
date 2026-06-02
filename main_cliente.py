@@ -9,6 +9,7 @@ import logging
 import csv
 import io
 import socket
+import http.client
 import shutil
 import re
 from html import escape
@@ -1592,11 +1593,13 @@ class MainWindow(QMainWindow):
         else: logging.warning(f"Favicon não encontrado: {FAVICON_PATH}")
         self.browser = QWebEngineView()
         self.browser.setPage(CustomWebEnginePage(self.browser))
+        self.browser.setHtml("<html><body style='font-family:Segoe UI,Arial,sans-serif;padding:32px;color:#243041'><h2>Iniciando App Orcamento Familiar...</h2><p>Aguarde alguns segundos.</p></body></html>")
         
         # Timer para esperar o servidor iniciar
         self.retry_timer = QTimer(self)
         self.retry_timer.timeout.connect(self.load_url)
         self.retry_count = 0
+        self.panel_request_active = False
         self.browser.loadFinished.connect(self.on_load_finished)
         
         self.load_url()
@@ -1608,9 +1611,15 @@ class MainWindow(QMainWindow):
             logging.error("Processo servidor morreu."); self.retry_timer.stop()
             QMessageBox.critical(self, "Erro Crítico", "Servidor falhou.\nConsulte app_log.txt."); QApplication.quit(); os._exit(1); return
         try:
-            with socket.create_connection(("127.0.0.1", self.server_port), timeout=0.15):
-                self.retry_timer.stop()
-        except OSError:
+            conn = http.client.HTTPConnection("127.0.0.1", self.server_port, timeout=0.35)
+            conn.request("GET", "/")
+            response = conn.getresponse()
+            servidor_pronto = response.status == 200
+            response.read(1)
+            conn.close()
+        except (OSError, http.client.HTTPException):
+            servidor_pronto = False
+        if not servidor_pronto:
             self.retry_count += 1
             if self.retry_count < 80:
                 self.retry_timer.start(250)
@@ -1619,15 +1628,23 @@ class MainWindow(QMainWindow):
                 self.retry_timer.stop()
                 QMessageBox.critical(self, "Erro Critico", "Nao foi possivel conectar.\nConsulte app_log.txt."); QApplication.quit(); os._exit(1)
             return
+        self.retry_timer.stop()
+        self.panel_request_active = True
         self.browser.setUrl(QUrl(f"http://127.0.0.1:{self.server_port}"))
         self.retry_count += 1
 
     def on_load_finished(self, ok):
-        if ok: 
+        if not self.panel_request_active:
+            return
+        if ok:
             logging.info("Página carregada!")
             self.retry_timer.stop()
-        else: 
+            self.panel_request_active = False
+        else:
             logging.warning("Falha ao carregar página.")
+            self.panel_request_active = False
+            self.browser.setHtml("<html><body style='font-family:Segoe UI,Arial,sans-serif;padding:32px;color:#243041'><h2>Iniciando App Orcamento Familiar...</h2><p>Aguarde alguns segundos.</p></body></html>")
+            self.retry_timer.start(250)
 
     def closeEvent(self, event):
         logging.info("Evento 'close'.");
