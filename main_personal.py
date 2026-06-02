@@ -1596,6 +1596,7 @@ class MainWindow(QMainWindow):
         self.retry_timer = QTimer(self)
         self.retry_timer.timeout.connect(self.load_url)
         self.retry_count = 0
+        self.browser.loadFinished.connect(self.on_load_finished)
         
         self.load_url()
         self.setCentralWidget(self.browser)
@@ -1605,15 +1606,20 @@ class MainWindow(QMainWindow):
         if self.server_process and not self.server_process.is_alive() and self.retry_count > 0:
             logging.error("Processo servidor morreu."); self.retry_timer.stop()
             QMessageBox.critical(self, "Erro Crítico", "Servidor falhou.\nConsulte app_log.txt."); QApplication.quit(); os._exit(1); return
+        try:
+            with socket.create_connection(("127.0.0.1", self.server_port), timeout=0.15):
+                self.retry_timer.stop()
+        except OSError:
+            self.retry_count += 1
+            if self.retry_count < 80:
+                self.retry_timer.start(250)
+            else:
+                logging.error("Tempo limite aguardando servidor local.")
+                self.retry_timer.stop()
+                QMessageBox.critical(self, "Erro Critico", "Nao foi possivel conectar.\nConsulte app_log.txt."); QApplication.quit(); os._exit(1)
+            return
         self.browser.setUrl(QUrl(f"http://127.0.0.1:{self.server_port}"))
         self.retry_count += 1
-        # Tenta carregar 10 vezes (5 segundos)
-        if self.retry_count < 10: self.retry_timer.start(500)
-        else:
-            logging.warning("Máximo de tentativas atingido.")
-            if self.server_process and not self.server_process.is_alive():
-                QMessageBox.critical(self, "Erro Crítico", "Não foi possível conectar.\nConsulte app_log.txt."); QApplication.quit(); os._exit(1)
-        if self.retry_count == 1: self.browser.loadFinished.connect(self.on_load_finished)
 
     def on_load_finished(self, ok):
         if ok: 
