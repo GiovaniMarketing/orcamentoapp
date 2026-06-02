@@ -19,6 +19,7 @@ ADMIN_DB = BASE_PATH / "admin_vendas.db"
 COMERCIAL_DIR = Path(os.getenv("ORCAMENTOAPP_COMERCIAL_DIR", r"E:\App Orcamento Familiar Comercial"))
 PACOTES_DIR = COMERCIAL_DIR / "pacotes_temporarios"
 BASE_CLIENTE_DIR = BASE_PATH / "base_cliente"
+GUIA_CLIENTE_PATH = BASE_PATH / "GUIA_DO_CLIENTE.html"
 RETENCAO_PACOTES_DIAS = 15
 
 app = FastAPI(title="OrcamentoApp - Admin de Vendas")
@@ -149,6 +150,8 @@ def criar_pacote_cliente(venda: dict, conteudo_licenca: str, tipo: str) -> tuple
         shutil.copytree(BASE_CLIENTE_DIR, work_dir)
 
     (work_dir / "license.key").write_text(conteudo_licenca, encoding="utf-8")
+    if GUIA_CLIENTE_PATH.exists():
+        shutil.copy2(GUIA_CLIENTE_PATH, work_dir / "GUIA_DO_CLIENTE.html")
     if entrega_tipo == "ATIVACAO_TRIAL" and tipo.upper() != "TRIAL":
         texto = (
             "ATIVACAO - APP ORCAMENTO FAMILIAR\n\n"
@@ -156,6 +159,7 @@ def criar_pacote_cliente(venda: dict, conteudo_licenca: str, tipo: str) -> tuple
             "2. Faca backup do arquivo budget_app.db antes da ativacao.\n"
             "3. Substitua somente o arquivo license.key da pasta atual por este novo arquivo.\n"
             "4. Abra o aplicativo novamente. Seus dados cadastrados no trial permanecem preservados.\n"
+            "5. Consulte GUIA_DO_CLIENTE.html sempre que precisar revisar as funcoes.\n"
         )
         (work_dir / "LEIA-ME_ATIVACAO.txt").write_text(texto, encoding="utf-8")
     else:
@@ -165,6 +169,7 @@ def criar_pacote_cliente(venda: dict, conteudo_licenca: str, tipo: str) -> tuple
             "2. Execute OrcamentoApp.exe.\n"
             "3. Nao apague license.key nem budget_app.db.\n"
             "4. Use o botao Backup dentro do aplicativo para preservar seus dados.\n"
+            "5. Abra GUIA_DO_CLIENTE.html ou use o botao Guia de Uso dentro do aplicativo.\n"
         )
         (work_dir / "LEIA-ME.txt").write_text(texto, encoding="utf-8")
 

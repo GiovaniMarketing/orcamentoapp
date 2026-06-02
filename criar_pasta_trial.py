@@ -99,6 +99,7 @@ def criar_base_cliente():
     shutil.copytree(BASE_PATH / "templates", BASE_CLIENTE_DIR / "templates")
     shutil.copytree(BASE_PATH / "static", BASE_CLIENTE_DIR / "static")
     shutil.copy2(BASE_PATH / "favicon.ico", BASE_CLIENTE_DIR / "favicon.ico")
+    shutil.copy2(BASE_PATH / "GUIA_DO_CLIENTE.html", BASE_CLIENTE_DIR / "GUIA_DO_CLIENTE.html")
     criar_banco_vazio(BASE_CLIENTE_DIR / "budget_app.db")
 
     licencas_dir = BASE_CLIENTE_DIR / "licenses"
@@ -132,7 +133,8 @@ def criar_trial():
         "1. Execute OrcamentoApp.exe.\n"
         "2. Nao apague o arquivo license.key.\n"
         "3. O banco budget_app.db fica nesta pasta e guarda os dados do teste.\n"
-        f"4. Esta licenca trial vence em {payload['expira_em'][:10]}.\n\n"
+        f"4. Esta licenca trial vence em {payload['expira_em'][:10]}.\n"
+        "5. Abra GUIA_DO_CLIENTE.html ou use o botao Guia de Uso dentro do aplicativo.\n\n"
         "Para ativar por 1 ano, substitua o license.key pelo arquivo de licenca enviado apos a compra.\n",
         encoding="utf-8",
     )

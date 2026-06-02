@@ -13,6 +13,7 @@ Aplicativo local para controle financeiro familiar, com receitas, despesas, inve
 - Exportacao anual para apoio na declaracao de imposto de renda.
 - Modo privacidade para ocultar valores na tela.
 - Status de licenca visivel no painel.
+- Guia de uso completo acessivel dentro do painel e incluido nos pacotes comerciais.
 
 ## Estrutura principal
 

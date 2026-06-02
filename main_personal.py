@@ -1161,6 +1161,7 @@ def gerar_relatorio_periodo_html(ano: int, tipo: str, mes: int | None = None, se
 TEMPLATES_DIR = BASE_PATH / "templates"
 STATIC_DIR = BASE_PATH / "static"
 FAVICON_PATH = BASE_PATH / "favicon.ico"
+GUIA_CLIENTE_PATH = BASE_PATH / "GUIA_DO_CLIENTE.html"
 
 def create_fastapi_app() -> FastAPI:
     """Cria e configura a instância do FastAPI com todas as rotas."""
@@ -1200,6 +1201,11 @@ def create_fastapi_app() -> FastAPI:
     async def favicon():
         if FAVICON_PATH.exists(): return FileResponse(FAVICON_PATH)
         else: return Response(status_code=204)
+
+    @app_fastapi_server.get("/guia", response_class=FileResponse, include_in_schema=False)
+    async def guia_cliente():
+        if GUIA_CLIENTE_PATH.exists(): return FileResponse(GUIA_CLIENTE_PATH)
+        return HTMLResponse("<h1>Guia de uso nao encontrado.</h1>", status_code=404)
 
     # --- Rotas API (Transações, Poupança, Relatórios) ---
     # (As rotas completas que você enviou estão aqui)

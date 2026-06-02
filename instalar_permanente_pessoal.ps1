@@ -60,6 +60,11 @@ if (Test-Path -LiteralPath $favicon) {
     Copy-Item -LiteralPath $favicon -Destination (Join-Path $InstallDir "favicon.ico") -Force
 }
 
+$guia = Join-Path $Root "GUIA_DO_CLIENTE.html"
+if (Test-Path -LiteralPath $guia) {
+    Copy-Item -LiteralPath $guia -Destination (Join-Path $InstallDir "GUIA_DO_CLIENTE.html") -Force
+}
+
 $UninstallScript = Join-Path $InstallDir "desinstalar_preservando_backup.ps1"
 @"
 `$ErrorActionPreference = "Stop"

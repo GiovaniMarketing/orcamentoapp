@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Guia do Cliente - App Orcamento Familiar</title>
+    <style>
+        :root { color-scheme:light; --azul:#2457c5; --verde:#137333; --cinza:#5f6b7a; --linha:#dfe4ea; --fundo:#f5f7fa; }
+        * { box-sizing:border-box; }
+        body { margin:0; font-family:Segoe UI,Arial,sans-serif; color:#243041; background:var(--fundo); line-height:1.55; }
+        header { background:#fff; border-bottom:1px solid var(--linha); padding:28px 20px; }
+        main, nav { max-width:960px; margin:0 auto; }
+        main { padding:20px; }
+        h1,h2,h3 { color:var(--azul); }
+        h1 { margin:0 0 6px; font-size:30px; }
+        h2 { margin-top:0; }
+        section { background:#fff; border:1px solid var(--linha); border-radius:8px; padding:20px; margin-bottom:16px; }
+        nav a { display:inline-block; margin:5px 14px 5px 0; color:var(--azul); font-weight:700; text-decoration:none; }
+        table { width:100%; border-collapse:collapse; }
+        th,td { border-bottom:1px solid var(--linha); padding:10px 8px; text-align:left; vertical-align:top; }
+        th { color:var(--cinza); font-size:13px; }
+        .destaque { border-left:4px solid var(--verde); padding-left:14px; }
+        .acoes { margin-bottom:18px; }
+        button { border:0; border-radius:6px; padding:10px 14px; background:var(--azul); color:#fff; font-weight:700; cursor:pointer; }
+        code { background:#eef1f5; padding:2px 5px; border-radius:4px; }
+        @media print { body{background:#fff} section{break-inside:avoid;border-color:#bbb} .acoes,nav a{display:none} }
+    </style>
+</head>
+<body>
+<header>
+    <nav>
+        <h1>App Orcamento Familiar</h1>
+        <p>Guia pratico para organizar receitas, despesas, metas e investimentos.</p>
+        <a href="#primeiros-passos">Primeiros passos</a>
+        <a href="#funcoes">Funcoes</a>
+        <a href="#rotina">Rotina recomendada</a>
+        <a href="#cuidados">Cuidados</a>
+    </nav>
+</header>
+<main>
+    <div class="acoes"><button onclick="window.print()">Imprimir ou salvar em PDF</button></div>
+    <section id="primeiros-passos">
+        <h2>Primeiros passos</h2>
+        <ol>
+            <li>Cadastre primeiro as receitas do mes, como salario, aposentadoria e renda extra.</li>
+            <li>Cadastre as despesas fixas e variaveis, informando vencimento e categoria.</li>
+            <li>Marque como recebido ou pago apenas o que realmente entrou ou saiu da conta.</li>
+            <li>Use o resumo financeiro para separar a situacao atual da previsao do mes.</li>
+            <li>Crie um backup depois do cadastro inicial e antes de alteracoes importantes.</li>
+        </ol>
+        <p class="destaque"><strong>Dica:</strong> comece de forma simples. O resultado melhora conforme os lancamentos passam a fazer parte da rotina.</p>
+    </section>
+    <section id="funcoes">
+        <h2>Entenda cada funcao</h2>
+        <table>
+            <thead><tr><th>Funcao</th><th>Como usar</th><th>Resultado esperado</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Saldo Real</strong></td><td>Consulte receitas recebidas menos despesas pagas.</td><td>Mostra quanto efetivamente esta disponivel fora dos investimentos.</td></tr>
+                <tr><td><strong>Saldo Previsto</strong></td><td>Compare todas as receitas e despesas cadastradas, mesmo pendentes.</td><td>Ajuda a antecipar se o mes tende a fechar positivo ou negativo.</td></tr>
+                <tr><td><strong>Patrimonio Atual</strong></td><td>Acompanhe saldo real mais saldo de investimentos.</td><td>Oferece uma visao mais completa do valor acumulado.</td></tr>
+                <tr><td><strong>Nova Receita</strong></td><td>Informe valor, descricao, categoria e vencimento. Marque recorrente para entradas frequentes.</td><td>Organiza salario, renda extra e demais entradas.</td></tr>
+                <tr><td><strong>Nova Despesa</strong></td><td>Registre contas fixas, compras e gastos diarios. Marque como paga somente apos o pagamento.</td><td>Evita esquecer vencimentos e revela onde o dinheiro esta sendo usado.</td></tr>
+                <tr><td><strong>Editar lancamento</strong></td><td>Use o botao de editar ao lado de qualquer receita ou despesa.</td><td>Corrige valor, data, categoria ou status informado por engano.</td></tr>
+                <tr><td><strong>Confirmar pagamento</strong></td><td>Use o controle ao lado do lancamento quando o recebimento ou pagamento ocorrer.</td><td>Mantem o saldo real atualizado.</td></tr>
+                <tr><td><strong>Analise do mes</strong></td><td>Escolha mes e ano e clique em analisar.</td><td>Mostra totais por categoria e participacao dos gastos na receita.</td></tr>
+                <tr><td><strong>Projecao</strong></td><td>Informe uma taxa mensal estimada e gere a projecao.</td><td>Simula a evolucao financeira dos proximos meses.</td></tr>
+                <tr><td><strong>Investimentos</strong></td><td>Registre aportes e retiradas. Use transferencia do saldo real quando aplicavel.</td><td>Separa dinheiro disponivel do valor investido.</td></tr>
+                <tr><td><strong>Metas financeiras</strong></td><td>Cadastre objetivo, valor desejado e prazo. Atualize o progresso ao reservar dinheiro.</td><td>Transforma planos em acompanhamento concreto.</td></tr>
+                <tr><td><strong>Relatorios</strong></td><td>Abra relatorios mensais, semestrais ou anuais e salve em PDF quando necessario.</td><td>Facilita revisoes periodicas e conversas familiares.</td></tr>
+                <tr><td><strong>Imposto de Renda</strong></td><td>Escolha o ano-base e baixe o CSV para conferencia.</td><td>Gera material de apoio para revisao e envio ao contador.</td></tr>
+                <tr><td><strong>Importar Extrato</strong></td><td>Opcionalmente selecione arquivo bancario <code>.csv</code> ou <code>.ofx</code>.</td><td>Agiliza o cadastro. Revise os itens importados.</td></tr>
+                <tr><td><strong>Backup</strong></td><td>Clique em Backup na area Ferramentas.</td><td>Cria uma copia de seguranca do banco local.</td></tr>
+                <tr><td><strong>Privacidade</strong></td><td>Ative quando outra pessoa estiver proxima da tela.</td><td>Oculta temporariamente os valores financeiros.</td></tr>
+                <tr><td><strong>Sobre</strong></td><td>Consulte cliente, tipo da licenca e vencimento.</td><td>Ajuda a acompanhar o trial ou a renovacao anual.</td></tr>
+            </tbody>
+        </table>
+    </section>
+    <section id="rotina">
+        <h2>Rotina recomendada</h2>
+        <h3>No inicio do mes</h3>
+        <ul><li>Cadastre ou confira receitas, despesas recorrentes e vencimentos.</li><li>Defina quanto pretende reservar para metas ou investimentos.</li></ul>
+        <h3>Durante a semana</h3>
+        <ul><li>Registre gastos relevantes e confirme pagamentos realizados.</li><li>Use a importacao de extrato apenas se ela tornar a rotina mais facil.</li></ul>
+        <h3>No fechamento do mes</h3>
+        <ul><li>Abra o relatorio mensal e observe quais categorias mais pesaram.</li><li>Compare saldo real e saldo previsto para ajustar o proximo mes.</li><li>Crie um backup.</li></ul>
+        <h3>A cada semestre</h3>
+        <ul><li>Revise o relatorio semestral, metas e investimentos.</li><li>Decida quais despesas podem ser reduzidas e quais objetivos merecem prioridade.</li></ul>
+    </section>
+    <section id="cuidados">
+        <h2>Cuidados importantes</h2>
+        <ul>
+            <li>Os dados ficam armazenados localmente no arquivo <code>budget_app.db</code>.</li>
+            <li>Nao apague nem altere <code>budget_app.db</code> ou <code>license.key</code>.</li>
+            <li>Guarde backups em outro local, como pendrive, HD externo ou pasta sincronizada.</li>
+            <li>A importacao de extrato e opcional. Quem preferir pode cadastrar tudo manualmente.</li>
+            <li>O relatorio de imposto de renda e material de apoio. A conferencia final deve ser feita pelo cliente ou contador.</li>
+        </ul>
+        <p><strong>Suporte comercial:</strong> (12) 98161-2085</p>
+    </section>
+</main>
+</body>
+</html>
