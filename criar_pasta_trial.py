@@ -129,23 +129,23 @@ def criar_trial():
     )
     (TRIAL_DIR / "license.key").write_text(conteudo, encoding="utf-8")
     (TRIAL_DIR / "LEIA-ME.txt").write_text(
-        "OrcamentoApp - Trial\n\n"
+        "App Orçamento Familiar - Trial\n\n"
         "1. Execute OrcamentoApp.exe.\n"
         "2. Nao apague o arquivo license.key.\n"
         "3. O banco budget_app.db fica nesta pasta e guarda os dados do teste.\n"
-        f"4. Esta licenca trial vence em {payload['expira_em'][:10]}.\n"
-        "5. Abra GUIA_DO_CLIENTE.html ou use o botao Guia de Uso dentro do aplicativo.\n\n"
+        f"4. Esta licença trial vence em {payload['expira_em'][:10]}.\n"
+        "5. Abra GUIA_DO_CLIENTE.html ou use o botão Guia de Uso dentro do aplicativo.\n\n"
         "IMPORTANTE: se aparecer uma janela preta do sistema junto com o aplicativo, deixe essa janela aberta enquanto estiver usando o app.\n\n"
-        "Para ativar por 1 ano, substitua o license.key pelo arquivo de licenca enviado apos a compra.\n",
+        "Para ativar por 1 ano, substitua o license.key pelo arquivo de licença enviado após a compra.\n",
         encoding="utf-8",
     )
     (TRIAL_DIR / "TERMO_DE_USO_TRIAL.txt").write_text(
-        "TERMO DE USO - APP ORCAMENTO FAMILIAR TRIAL\n\n"
-        "Este pacote e fornecido para avaliacao por prazo limitado.\n"
+        "TERMO DE USO - APP ORÇAMENTO FAMILIAR TRIAL\n\n"
+        "Este pacote é fornecido para avaliação por prazo limitado.\n"
         "Os dados inseridos ficam armazenados localmente no arquivo budget_app.db.\n"
-        "O usuario e responsavel por manter copia de seguranca dos seus dados.\n"
-        "A ativacao anual depende de uma license.key valida emitida pelo fornecedor.\n"
-        "Nao apague nem altere os arquivos license.key e budget_app.db sem antes fazer backup.\n",
+        "O usuário é responsável por manter cópia de segurança dos seus dados.\n"
+        "A ativação anual depende de uma license.key válida emitida pelo fornecedor.\n"
+        "Não apague nem altere os arquivos license.key e budget_app.db sem antes fazer backup.\n",
         encoding="utf-8",
     )
 

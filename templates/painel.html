@@ -178,7 +178,7 @@
     <div class="card topo-ajuda" style="grid-column: 1 / -1;">
         <div>
             <h2>Comece pelo Guia de Uso</h2>
-            <p>Veja as principais funcoes do app e uma rotina simples para organizar o orcamento familiar.</p>
+            <p>Veja as principais funções do app e uma rotina simples para organizar o orçamento familiar.</p>
             <p class="aviso-sistema"><strong>Aviso:</strong> se aparecer uma janela preta do sistema junto com o aplicativo, deixe essa janela aberta enquanto estiver usando o app. Fechar essa janela pode encerrar o aplicativo.</p>
         </div>
         <button type="button" onclick="window.open('/guia', '_blank')">Abrir Guia de Uso</button>
@@ -842,7 +842,7 @@
 
     function mostrarSobre() {
         const s = statusLicencaCache || {};
-        alert(`App Orcamento Familiar\nVersao: 1.1\nLicenca: ${s.tipo_licenca || 'N/I'}\nCliente: ${s.cliente_nome || 'N/I'}\nEmail: ${s.cliente_email || 'N/I'}\nVencimento: ${s.expira_em ? formatarData(s.expira_em) : 'N/I'}\nSuporte: informe seu contato comercial`);
+        alert(`App Orçamento Familiar\nVersão: 1.1\nLicença: ${s.tipo_licenca || 'N/I'}\nCliente: ${s.cliente_nome || 'N/I'}\nEmail: ${s.cliente_email || 'N/I'}\nVencimento: ${s.expira_em ? formatarData(s.expira_em) : 'N/I'}\nSuporte: informe seu contato comercial`);
     }
 
     async function importarExtratoSelecionado(file) {

@@ -154,23 +154,23 @@ def criar_pacote_cliente(venda: dict, conteudo_licenca: str, tipo: str) -> tuple
         shutil.copy2(GUIA_CLIENTE_PATH, work_dir / "GUIA_DO_CLIENTE.html")
     if entrega_tipo == "ATIVACAO_TRIAL" and tipo.upper() != "TRIAL":
         texto = (
-            "ATIVACAO - APP ORCAMENTO FAMILIAR\n\n"
+            "ATIVAÇÃO - APP ORÇAMENTO FAMILIAR\n\n"
             "1. Feche o aplicativo.\n"
-            "2. Faca backup do arquivo budget_app.db antes da ativacao.\n"
+            "2. Faça backup do arquivo budget_app.db antes da ativação.\n"
             "3. Substitua somente o arquivo license.key da pasta atual por este novo arquivo.\n"
             "4. Abra o aplicativo novamente. Seus dados cadastrados no trial permanecem preservados.\n"
-            "5. Consulte GUIA_DO_CLIENTE.html sempre que precisar revisar as funcoes.\n"
+            "5. Consulte GUIA_DO_CLIENTE.html sempre que precisar revisar as funções.\n"
             "6. Se aparecer uma janela preta do sistema, deixe essa janela aberta enquanto usa o app.\n"
         )
         (work_dir / "LEIA-ME_ATIVACAO.txt").write_text(texto, encoding="utf-8")
     else:
         texto = (
-            "APP ORCAMENTO FAMILIAR\n\n"
+            "APP ORÇAMENTO FAMILIAR\n\n"
             "1. Extraia todos os arquivos para uma pasta do computador.\n"
             "2. Execute OrcamentoApp.exe.\n"
-            "3. Nao apague license.key nem budget_app.db.\n"
-            "4. Use o botao Backup dentro do aplicativo para preservar seus dados.\n"
-            "5. Abra GUIA_DO_CLIENTE.html ou use o botao Guia de Uso dentro do aplicativo.\n"
+            "3. Não apague license.key nem budget_app.db.\n"
+            "4. Use o botão Backup dentro do aplicativo para preservar seus dados.\n"
+            "5. Abra GUIA_DO_CLIENTE.html ou use o botão Guia de Uso dentro do aplicativo.\n"
             "6. Se aparecer uma janela preta do sistema, deixe essa janela aberta enquanto usa o app.\n"
         )
         (work_dir / "LEIA-ME.txt").write_text(texto, encoding="utf-8")

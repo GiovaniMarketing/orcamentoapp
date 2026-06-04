@@ -4,16 +4,16 @@ Aplicativo local para controle financeiro familiar, com receitas, despesas, inve
 
 ## Recursos do app
 
-- Controle de receitas, despesas, recorrencias e status pago/a vencer.
+- Controle de receitas, despesas, recorrências e status pago/a vencer.
 - Painel com alertas do mes, contas vencendo, sobra prevista e maior categoria de gasto.
 - Metas financeiras com progresso.
-- Importacao opcional de extratos `.csv` e `.ofx`.
+- Importação opcional de extratos `.csv` e `.ofx`.
 - Backup local do banco `budget_app.db`.
-- Relatorios mensal, semestral e anual em HTML imprimivel/salvavel em PDF.
-- Exportacao anual para apoio na declaracao de imposto de renda.
+- Relatórios mensal, semestral e anual em HTML imprimível/salvável em PDF.
+- Exportação anual para apoio na declaração de imposto de renda.
 - Modo privacidade para ocultar valores na tela.
-- Status de licenca visivel no painel.
-- Guia de uso completo acessivel dentro do painel e incluido nos pacotes comerciais.
+- Status de licença visível no painel.
+- Guia de uso completo acessível dentro do painel e incluído nos pacotes comerciais.
 - Aviso no topo do painel para manter aberta a janela preta do sistema, quando ela aparecer.
 
 ## Estrutura principal
