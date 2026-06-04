@@ -6,19 +6,21 @@
 - [ ] Conferir CPF/CNPJ e conta bancária.
 - [ ] Cadastrar produto.
 - [ ] Definir pagamento único.
+- [ ] Definir produto como plano anual, sem trial.
 - [ ] Definir preço.
 - [ ] Criar imagem principal.
 - [ ] Inserir descrição comercial.
 - [ ] Informar página de vendas ou Instagram/site.
 - [ ] Personalizar checkout.
 - [ ] Copiar link de checkout.
+- [ ] Conferir se o material entregue pela Kiwify não contém licença paga genérica.
 
 ## Antes da primeira venda real
 
 - [ ] Abrir Admin de Vendas.
 - [ ] Gerar um pacote de teste.
 - [ ] Conferir se `GUIA_DO_CLIENTE.html` está no pacote.
-- [ ] Conferir se `license.key` está no pacote.
+- [ ] Conferir se o instalador/base não contém licença paga genérica.
 - [ ] Conferir se o app abre no ambiente de teste.
 - [ ] Separar mensagem padrão de envio ao cliente.
 
@@ -27,10 +29,10 @@
 - [ ] Conferir status da venda na Kiwify.
 - [ ] Copiar nome, e-mail e telefone do cliente.
 - [ ] Cadastrar venda no Admin de Vendas.
-- [ ] Gerar pacote completo ou ativação.
-- [ ] Enviar ao cliente.
+- [ ] Gerar licença anual individual.
+- [ ] Enviar `license.key` ou ZIP de ativação ao cliente.
 - [ ] Registrar envio.
-- [ ] Excluir pacote temporário após envio.
+- [ ] Excluir pacote temporário após envio, se houver.
 
 ## Para automação futura
 

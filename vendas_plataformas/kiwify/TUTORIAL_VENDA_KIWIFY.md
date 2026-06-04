@@ -23,6 +23,9 @@ Modelo de pagamento recomendado no início:
 - Pagamento único.
 - Licença válida por 1 ano.
 - Renovação vendida como nova compra ou link específico de renovação.
+- Não oferecer trial pela Kiwify.
+
+Neste canal, a Kiwify deve vender somente o plano anual. O trial pode continuar existindo no sistema para outras estratégias comerciais, mas não deve aparecer como produto ou entrega dentro da Kiwify.
 
 ## 3. Formato de entrega recomendado
 
@@ -35,7 +38,7 @@ Use este modelo para começar com segurança:
 3. Você recebe a notificação da venda.
 4. Você entra no Admin de Vendas do Orçamento Familiar.
 5. Cadastra o cliente.
-6. Gera o pacote ou a licença.
+6. Gera a licença anual individual.
 7. Envia para o cliente por e-mail, WhatsApp ou área de entrega definida.
 
 Vantagem:
@@ -74,8 +77,9 @@ O painel admin atual roda localmente no seu computador. Para automação por web
 3. Clique em Criar produto.
 4. Escolha pagamento único.
 5. Escolha o formato de entrega mais adequado:
+   - Área de membros da Kiwify, se a Kiwify for entregar o instalador ou um arquivo com link de download.
    - Área de membros externa, se for usar automação por webhook.
-   - Quero apenas aceitar pagamentos, se a entrega será manual assistida.
+   - Quero apenas aceitar pagamentos, se a entrega será totalmente manual assistida.
 6. Preencha nome, preço, descrição e página/site obrigatório.
 7. Personalize o checkout.
 8. Copie o link de checkout na aba Links.
@@ -96,7 +100,7 @@ WhatsApp: (12) 98161-2085
 
 Entrega:
 
-Licença anual e instruções de instalação.
+Instalador/base do app e instruções de instalação. A licença anual deve ser individual por cliente.
 
 Garantia/reembolso:
 
@@ -129,26 +133,49 @@ Evite:
 
 ## 6. Entrega manual pelo Admin de Vendas
 
-### Venda direta sem trial
+### Venda anual pela Kiwify
 
 1. Confirme a venda aprovada na Kiwify.
 2. Abra o Admin de Vendas.
 3. Cadastre o cliente como PAGO.
-4. Escolha Instalação completa.
-5. Gere o pacote.
-6. Envie o ZIP ao cliente.
-7. Após o envio, use Excluir após envio para liberar espaço.
+4. Se a Kiwify já entregou o instalador, escolha Cliente já possui instalação/base: somente licença.
+5. Gere a licença anual.
+6. Envie somente o `license.key` ou o ZIP de ativação.
 
-### Cliente que já tem trial
+Se você preferir que a Kiwify não entregue o instalador, gere a instalação completa pelo Admin de Vendas e envie o ZIP ao cliente. Essa alternativa dá mais controle, mas não é tão imediata.
 
-1. Confirme a venda aprovada na Kiwify.
-2. Abra o Admin de Vendas.
-3. Cadastre o cliente como PAGO.
-4. Escolha Cliente já possui trial: somente licença.
-5. Gere a licença.
-6. Envie somente o ZIP de ativação.
+## 7. Como fazer a Kiwify entregar o instalador
 
-## 7. Entrega automática por webhook
+Pelo suporte da Kiwify, anexos na área de membros têm limite de até 10 arquivos, com até 100 MB cada.
+
+Por isso, existem dois caminhos:
+
+### Caminho A - Instalar direto pela Kiwify
+
+Use este caminho somente se o ZIP final couber no limite da Kiwify.
+
+1. Cadastre o produto como Área de membros da Kiwify.
+2. Crie um módulo chamado Download do App.
+3. Crie um conteúdo chamado Instalador App Orçamento Familiar.
+4. Em Anexos, envie o ZIP do instalador/base.
+5. Na descrição, explique que a licença anual será enviada individualmente.
+
+### Caminho B - Kiwify entrega um arquivo com link externo
+
+Use este caminho se o ZIP do app passar de 100 MB.
+
+1. Hospede o instalador/base em local externo seguro.
+2. Crie um arquivo pequeno chamado `LEIA-ME_DOWNLOAD_APP_ORCAMENTO.pdf` ou `.html`.
+3. Coloque nesse arquivo:
+   - link de download do instalador;
+   - instruções de instalação;
+   - aviso da janela preta do sistema;
+   - informação de que a licença é individual.
+4. Anexe esse arquivo pequeno na área de membros da Kiwify.
+
+Esse é o caminho mais provável para o App Orçamento Familiar, porque o pacote do executável tende a ser grande.
+
+## 8. Entrega automática por webhook
 
 Para automatizar, será necessário criar um serviço intermediário.
 
@@ -168,13 +195,13 @@ Cuidados importantes:
 - Validar reembolso/cancelamento, se desejar bloquear renovação futura.
 - Não depender do seu computador pessoal ligado para entrega automática.
 
-## 8. Política de entrega recomendada
+## 9. Política de entrega recomendada
 
 Texto para checkout ou página de obrigado:
 
-Após a confirmação do pagamento, você receberá as instruções de instalação e ativação do App Orçamento Familiar. Em compras automáticas, o acesso pode ser enviado em poucos minutos. Em compras assistidas, o envio será feito pelo suporte em horário comercial.
+Após a confirmação do pagamento, você terá acesso ao instalador/base do App Orçamento Familiar pela área de membros da Kiwify ou pelo link de download informado. A licença anual é individual e será enviada conforme o processo de ativação informado na compra.
 
-## 9. Checklist antes de vender
+## 10. Checklist antes de vender
 
 - Produto cadastrado na Kiwify.
 - Link de checkout testado.
@@ -186,14 +213,18 @@ Após a confirmação do pagamento, você receberá as instruções de instalaç
 - Admin de Vendas funcionando.
 - Base cliente atualizada.
 - Guia do cliente incluído no pacote.
+- Instalação/base sem licença paga genérica.
+- Processo de geração de licença anual individual testado.
 - Processo de envio testado com uma venda simulada.
 
-## 10. Recomendação prática
+## 11. Recomendação prática
 
-Comece com venda manual assistida para validar demanda e suporte.
+Comece vendendo o plano anual pela Kiwify, sem trial.
 
-Depois que houver volume, automatize com webhook.
+A Kiwify pode entregar o instalador/base. O seu painel admin continua responsável pela licença individual.
+
+Depois que houver volume, automatize a geração da licença com webhook.
 
 O ideal final é:
 
-Compra aprovada na Kiwify -> licença gerada automaticamente -> cliente recebe instruções imediatamente.
+Compra aprovada na Kiwify -> cliente baixa o instalador/base -> licença individual gerada automaticamente -> cliente ativa o app.
