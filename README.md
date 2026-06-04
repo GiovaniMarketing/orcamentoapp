@@ -14,6 +14,7 @@ Aplicativo local para controle financeiro familiar, com receitas, despesas, inve
 - Modo privacidade para ocultar valores na tela.
 - Status de licenca visivel no painel.
 - Guia de uso completo acessivel dentro do painel e incluido nos pacotes comerciais.
+- Aviso no topo do painel para manter aberta a janela preta do sistema, quando ela aparecer.
 
 ## Estrutura principal
 

@@ -98,3 +98,4 @@ Mantenha os avisos de bibliotecas na pasta `licenses` do pacote distribuido.
 - Relatorios mensal, semestral e anual em HTML imprimivel.
 - Modo privacidade para ocultar valores na tela.
 - Guia de uso completo no arquivo `GUIA_DO_CLIENTE.html` e no botao `Guia de Uso` do painel.
+- Aviso para o cliente manter aberta a janela preta do sistema, quando ela aparecer junto com o aplicativo.

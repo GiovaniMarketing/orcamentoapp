@@ -135,6 +135,7 @@ def criar_trial():
         "3. O banco budget_app.db fica nesta pasta e guarda os dados do teste.\n"
         f"4. Esta licenca trial vence em {payload['expira_em'][:10]}.\n"
         "5. Abra GUIA_DO_CLIENTE.html ou use o botao Guia de Uso dentro do aplicativo.\n\n"
+        "IMPORTANTE: se aparecer uma janela preta do sistema junto com o aplicativo, deixe essa janela aberta enquanto estiver usando o app.\n\n"
         "Para ativar por 1 ano, substitua o license.key pelo arquivo de licenca enviado apos a compra.\n",
         encoding="utf-8",
     )

@@ -90,6 +90,11 @@
         .licenca-status.critico { border-left-color: var(--cor-perigo); }
         .licenca-status p { margin: 0.25rem 0; font-size: 0.9rem; color: var(--cor-texto); }
         .licenca-status small { color: var(--cor-texto-claro); }
+        .topo-ajuda { border-left: 5px solid var(--cor-sucesso); display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; }
+        .topo-ajuda h2 { margin-bottom: 0.45rem; }
+        .topo-ajuda p { margin: 0.25rem 0; font-size: 0.9rem; color: var(--cor-texto); }
+        .topo-ajuda .aviso-sistema { color: var(--cor-texto-claro); }
+        .topo-ajuda button { width: auto; min-width: 170px; background: var(--cor-primaria); }
         .tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.6rem; }
         .tool-grid button, .tool-grid label { width: 100%; background: var(--cor-primaria); color: white; border-radius: 6px; padding: 0.65rem; text-align: center; box-sizing: border-box; cursor: pointer; font-weight: 700; font-size: 0.85rem; }
         .tool-grid input[type="file"] { display: none; }
@@ -157,6 +162,8 @@
         @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
         @media (max-width: 768px) {
             .indicadores { grid-template-columns: 1fr 1fr; }
+            .topo-ajuda { grid-template-columns: 1fr; }
+            .topo-ajuda button { width: 100%; }
             h2 { font-size: 1.2rem; }
             .indicador p { font-size: 1.2rem; }
             form input, form select, button { font-size: 0.85rem; padding: 0.5rem; }
@@ -168,6 +175,15 @@
 <body>
 
 <div class="container">
+    <div class="card topo-ajuda" style="grid-column: 1 / -1;">
+        <div>
+            <h2>Comece pelo Guia de Uso</h2>
+            <p>Veja as principais funcoes do app e uma rotina simples para organizar o orcamento familiar.</p>
+            <p class="aviso-sistema"><strong>Aviso:</strong> se aparecer uma janela preta do sistema junto com o aplicativo, deixe essa janela aberta enquanto estiver usando o app. Fechar essa janela pode encerrar o aplicativo.</p>
+        </div>
+        <button type="button" onclick="window.open('/guia', '_blank')">Abrir Guia de Uso</button>
+    </div>
+
     <div class="card licenca-status" id="licenca-status-card" style="grid-column: 1 / -1; display: none;">
         <h2>Status da Licença</h2>
         <p id="licenca-status-msg">Verificando licença...</p>
@@ -274,7 +290,6 @@
                     <button type="button" onclick="criarBackup()">Backup</button>
                     <button type="button" onclick="alternarPrivacidade()">Privacidade</button>
                     <button type="button" onclick="mostrarSobre()">Sobre</button>
-                    <button type="button" onclick="window.open('/guia', '_blank')">Guia de Uso</button>
                     <label for="arquivo-extrato">Importar Extrato</label>
                     <input type="file" id="arquivo-extrato" accept=".csv,.ofx">
                 </div>
