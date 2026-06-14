@@ -1,0 +1,32 @@
+GUIA DE INSTALACAO - APP ORCAMENTO FAMILIAR
+
+Produto: Licenca anual
+Suporte: WhatsApp (12) 98161-2085
+
+1. Baixe o arquivo ZIP do App Orcamento Familiar.
+
+2. Extraia o ZIP antes de abrir o aplicativo.
+   Nao execute o app diretamente de dentro do arquivo compactado.
+
+3. Para abrir, clique duas vezes em:
+   OrcamentoApp.exe
+
+4. Licenca anual:
+   O arquivo license.key e individual e sera enviado pelo suporte.
+   Quando receber a licenca, coloque ou mantenha o arquivo license.key na mesma pasta do aplicativo.
+
+5. Arquivos importantes:
+   - OrcamentoApp.exe: aplicativo.
+   - license.key: licenca anual do cliente.
+   - budget_app.db: banco de dados local com os lancamentos financeiros.
+   - GUIA_DO_CLIENTE.html: guia de uso das funcoes.
+
+6. Janela preta do sistema:
+   Se aparecer uma janela preta junto com o app, deixe-a aberta enquanto estiver usando o sistema.
+   Ela e parte do funcionamento local do aplicativo.
+
+7. Backup:
+   Antes de apagar, mover ou atualizar a pasta do app, faca uma copia do arquivo budget_app.db.
+
+8. Primeiro uso:
+   Abra o app, confira o status da licenca no inicio da tela e consulte o Guia de Uso para cadastrar receitas, despesas, metas e relatorios.

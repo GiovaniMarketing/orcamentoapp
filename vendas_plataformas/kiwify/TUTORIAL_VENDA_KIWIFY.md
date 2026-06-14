@@ -25,7 +25,7 @@ Modelo de pagamento recomendado no início:
 - Renovação vendida como nova compra ou link específico de renovação.
 - Não oferecer trial pela Kiwify.
 
-Neste canal, a Kiwify deve vender somente o plano anual. O trial pode continuar existindo no sistema para outras estratégias comerciais, mas não deve aparecer como produto ou entrega dentro da Kiwify.
+Neste canal, a Kiwify deve vender somente o plano anual. O trial fica fora do fluxo principal de venda.
 
 ## 3. Formato de entrega recomendado
 
@@ -138,7 +138,7 @@ Evite:
 1. Confirme a venda aprovada na Kiwify.
 2. Abra o Admin de Vendas.
 3. Cadastre o cliente como PAGO.
-4. Se a Kiwify já entregou o instalador, escolha Cliente já possui instalação/base: somente licença.
+4. Se a Kiwify já entregou o instalador/base, escolha Somente licença: cliente já possui instalação/base.
 5. Gere a licença anual.
 6. Envie somente o `license.key` ou o ZIP de ativação.
 

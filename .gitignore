@@ -23,6 +23,9 @@ pacotes_clientes/
 # Generated packages and executables
 *.exe
 *.zip
+*.rar
+trial_orcamentoapp_*/
+pacotes_temporarios/
 
 # Databases and local data
 *.db
@@ -34,6 +37,9 @@ data/
 # Logs/runtime
 *.log
 app_log.txt
+
+# Local commercial documents
+marketing/*.docx
 
 # Local/system files
 desktop.ini

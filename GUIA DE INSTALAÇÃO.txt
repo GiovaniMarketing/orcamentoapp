@@ -1,0 +1,30 @@
+GUIA DE INSTALAÇÃO: Orçamento Familiar (Versão de Avaliação)
+Seja bem-vindo(a) ao seu novo organizador financeiro! Para garantir que tudo funcione corretamente, siga estes passos simples:
+
+1. Preparação (Importante)
+Extraia o arquivo: Não tente abrir o aplicativo diretamente de dentro do arquivo ZIP.
+
+Como fazer: Clique com o botão direito no arquivo OrcamentoApp_TRIAL.zip e escolha "Extrair tudo". Escolha uma pasta de fácil acesso, como sua Área de Trabalho ou a pasta Documentos.
+
+2. Precauções de Segurança (Windows)
+Como este é um aplicativo personalizado, o Windows pode exibir uma mensagem de proteção por não reconhecê-lo como um software de uma grande corporação.
+
+O que fazer: Se aparecer uma tela azul escrita "O Windows protegeu o seu computador":
+
+Clique no link "Mais informações".
+
+Um botão "Executar assim mesmo" irá aparecer. Clique nele.
+
+Janela de Comandos (Preto): Ao abrir o programa, é normal que uma janela preta (terminal) apareça. Não a feche! Ela é o "motor" do seu aplicativo. Pode minimizá-la, mas mantenha-a aberta enquanto estiver usando o sistema.
+
+3. Integridade dos Dados
+Arquivos Essenciais: Dentro da pasta, você verá arquivos como license.key e budget_app.db.
+
+Não apague nem mova esses arquivos, pois eles contêm sua licença de uso e todos os seus dados financeiros.
+
+Backup: Recomendamos que, periodicamente, você faça uma cópia da pasta inteira do aplicativo em um pendrive ou na nuvem para garantir a segurança dos seus dados.
+
+4. Primeiros Passos
+Para começar, dê um clique duplo em OrcamentoApp.exe.
+
+Caso tenha dúvidas sobre como utilizar as ferramentas de orçamento, consulte o arquivo GUIA_DO_CLIENTE.html que está na mesma pasta.

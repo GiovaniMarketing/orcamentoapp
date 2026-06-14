@@ -1,0 +1,186 @@
+TUTORIAL DEFINITIVO - PLANO ANUAL NA KIWIFY
+
+Objetivo:
+Vender o App Orcamento Familiar como licenca anual pela Kiwify.
+A Kiwify libera o acesso ao instalador/base do app, e voce envia a licenca anual individual depois de confirmar a venda aprovada.
+
+PASTAS IMPORTANTES
+
+1. ZIP grande para hospedar no Google Drive:
+   E:\orcamentoapp\vendas_plataformas\kiwify\entrega_kiwify\hospedar_externo\App_Orcamento_Familiar_Instalador.zip
+
+2. Arquivo pequeno para anexar na Kiwify:
+   E:\orcamentoapp\vendas_plataformas\kiwify\entrega_kiwify\anexar_na_kiwify\LEIA_ME_DOWNLOAD_APP_ORCAMENTO_FAMILIAR.html
+
+3. Trial fora da Kiwify:
+   E:\orcamentoapp\vendas_plataformas\trial_fora_kiwify\OrcamentoApp_TRIAL_7_DIAS.zip
+
+Importante:
+Na Kiwify, por enquanto, vender somente o plano anual. Nao disponibilizar trial pela Kiwify.
+
+
+PASSO 1 - HOSPEDAR O ZIP GRANDE NO GOOGLE DRIVE
+
+1. Abra o Google Drive.
+2. Crie uma pasta, por exemplo:
+   App Orcamento Familiar - Download
+3. Envie para essa pasta o arquivo:
+   App_Orcamento_Familiar_Instalador.zip
+4. Clique com o botao direito no arquivo enviado.
+5. Escolha Compartilhar.
+6. Mude o acesso para:
+   Qualquer pessoa com o link pode visualizar.
+7. Copie o link.
+8. Teste o link em uma janela anonima do navegador para confirmar que baixa sem pedir permissao.
+
+Observacao:
+Esse ZIP nao tem license.key. Isso esta correto.
+O cliente baixa a base do app, mas so usa de forma anual depois que voce envia a licenca individual.
+
+
+PASSO 2 - COLOCAR O LINK NO ARQUIVO QUE VAI PARA A KIWIFY
+
+1. Abra este arquivo:
+   E:\orcamentoapp\vendas_plataformas\kiwify\entrega_kiwify\anexar_na_kiwify\LEIA_ME_DOWNLOAD_APP_ORCAMENTO_FAMILIAR.html
+2. Confira o botao:
+   Baixar instalador
+3. Se voce manteve o mesmo arquivo no Google Drive, pode deixar como esta.
+4. Se voce enviou outro arquivo ou gerou outro link, troque o endereco do botao pelo novo link.
+5. Salve o arquivo.
+6. Abra o HTML no navegador e teste o botao.
+
+Observacao importante:
+Se o Google Drive mostrar "Nao foi possivel visualizar o arquivo", isso nao e erro.
+O arquivo e grande e deve ser baixado pelo botao Download.
+
+
+PASSO 3 - CADASTRAR O PRODUTO NA KIWIFY
+
+1. Entre na Kiwify.
+2. Crie um produto digital.
+3. Nome sugerido:
+   App Orcamento Familiar - Licenca Anual
+4. Tipo de pagamento:
+   Pagamento unico.
+5. Entrega:
+   Area de membros da Kiwify ou conteudo de download.
+6. Crie um modulo chamado:
+   Download do App
+7. Crie uma aula/conteudo chamado:
+   Instalador e solicitacao da licenca
+8. Anexe somente este arquivo pequeno:
+   LEIA_ME_DOWNLOAD_APP_ORCAMENTO_FAMILIAR.html
+9. Na descricao do conteudo, escreva:
+   Baixe o instalador pelo link informado e solicite sua licenca anual pelo WhatsApp (12) 98161-2085, enviando nome completo, e-mail usado na compra e data aproximada da compra.
+
+
+PASSO 4 - TEXTO SIMPLES PARA A PAGINA DE OBRIGADO OU CONTEUDO DA KIWIFY
+
+Use este texto:
+
+Obrigado pela compra do App Orcamento Familiar - Licenca Anual.
+
+1. Acesse o conteudo de download liberado na Kiwify.
+2. Baixe o instalador/base do aplicativo.
+3. Extraia o ZIP antes de abrir.
+4. Solicite sua licenca anual pelo WhatsApp (12) 98161-2085.
+5. Envie nome completo, e-mail usado na compra e data aproximada da compra.
+6. Apos a conferencia da venda aprovada, voce recebera o arquivo de licenca anual.
+
+Importante: se aparecer uma janela preta do sistema junto com o aplicativo, deixe essa janela aberta enquanto usa o app.
+
+
+PASSO 5 - QUANDO O CLIENTE PEDIR A LICENCA
+
+Quando o cliente chamar no WhatsApp:
+
+1. Peca ou confirme:
+   - nome completo;
+   - e-mail usado na Kiwify;
+   - celular, preferencialmente WhatsApp;
+   - data aproximada da compra.
+2. Entre na Kiwify.
+3. Confira se a venda esta aprovada.
+4. Abra o Admin de Vendas do Orcamento Familiar.
+5. Cadastre uma nova venda anual.
+6. Preencha nome, e-mail, celular/WhatsApp e valor.
+7. Em Entrega, selecione:
+   Somente licenca: cliente ja possui instalacao/base
+8. Clique em:
+   Cadastrar venda anual
+9. Na lista, clique em:
+   Confirmar pagamento e gerar licenca anual
+10. Baixe ou localize o pacote de licenca gerado pelo painel.
+11. Envie ao cliente o ZIP/arquivo de licenca.
+
+
+PASSO 6 - MENSAGEM PARA ENVIAR A LICENCA AO CLIENTE
+
+Use esta mensagem:
+
+Ola! Sua licenca anual do App Orcamento Familiar foi gerada.
+
+Siga estes passos:
+
+1. Feche o aplicativo, caso esteja aberto.
+2. Extraia o arquivo de licenca recebido.
+3. Coloque o arquivo license.key na mesma pasta onde esta o OrcamentoApp.exe.
+4. Abra novamente o aplicativo.
+5. Confira no inicio da tela se aparece a licenca anual valida.
+
+Nao apague o arquivo budget_app.db, pois ele guarda seus dados financeiros.
+
+
+PASSO 7 - O QUE NAO ENVIAR AO CLIENTE
+
+Nunca enviar:
+
+- codigo-fonte;
+- admin_vendas.py;
+- pasta budget_api;
+- pasta orcamentoapp inteira;
+- license.key generico;
+- banco com dados pessoais seus;
+- arquivos .env, tokens, senhas ou credenciais.
+
+
+PASSO 8 - ROTINA RECOMENDADA
+
+Toda venda pela Kiwify deve seguir este controle:
+
+1. Venda aprovada na Kiwify.
+2. Cliente solicita licenca pelo WhatsApp.
+3. Voce confere a venda aprovada.
+4. Voce gera a licenca no Admin de Vendas.
+5. Voce envia a licenca ao cliente.
+6. Voce registra observacao no painel, se necessario.
+7. Depois de enviar, exclua pacote temporario grande quando o painel permitir.
+
+
+PASSO 9 - RENOVACAO
+
+Quando estiver perto de vencer:
+
+1. Avise o cliente pelo WhatsApp.
+2. Envie o link de renovacao ou oriente nova compra.
+3. Depois do pagamento aprovado, abra o Admin de Vendas.
+4. Clique em renovar por mais 1 ano.
+5. Envie a nova licenca ao cliente.
+
+
+RESUMO CURTO
+
+Kiwify entrega:
+- arquivo HTML pequeno com link para baixar o instalador/base.
+
+Google Drive hospeda:
+- App_Orcamento_Familiar_Instalador.zip.
+
+Voce entrega manualmente:
+- license.key anual individual, gerado no Admin de Vendas.
+
+Cliente precisa saber:
+- baixar o ZIP;
+- extrair antes de abrir;
+- pedir a licenca no WhatsApp;
+- nao apagar license.key nem budget_app.db.

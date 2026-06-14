@@ -21,6 +21,7 @@ PACOTES_DIR = COMERCIAL_DIR / "pacotes_temporarios"
 BASE_CLIENTE_DIR = BASE_PATH / "base_cliente"
 GUIA_CLIENTE_PATH = BASE_PATH / "GUIA_DO_CLIENTE.html"
 RETENCAO_PACOTES_DIAS = 15
+ENTREGAS_SOMENTE_LICENCA = {"SOMENTE_LICENCA"}
 
 app = FastAPI(title="OrcamentoApp - Admin de Vendas")
 
@@ -136,13 +137,14 @@ def criar_zip(pasta: Path) -> Path:
 
 def criar_pacote_cliente(venda: dict, conteudo_licenca: str, tipo: str) -> tuple[Path, Path]:
     entrega_tipo = venda.get("entrega_tipo") or "INSTALACAO_COMPLETA"
-    sufixo = "trial" if tipo.upper() == "TRIAL" else "ativacao" if entrega_tipo == "ATIVACAO_TRIAL" else "vendido"
+    somente_licenca = entrega_tipo in ENTREGAS_SOMENTE_LICENCA
+    sufixo = "licenca" if somente_licenca else "vendido"
     nome_base = f"{venda['id']:04d}_{nome_seguro(venda['cliente_nome'])}_{sufixo}"
     work_dir = PACOTES_DIR / nome_base
 
     if work_dir.exists():
         remover_caminho_controlado(work_dir)
-    if entrega_tipo == "ATIVACAO_TRIAL" and tipo.upper() != "TRIAL":
+    if somente_licenca:
         work_dir.mkdir(parents=True)
     else:
         if not BASE_CLIENTE_DIR.exists():
@@ -152,23 +154,23 @@ def criar_pacote_cliente(venda: dict, conteudo_licenca: str, tipo: str) -> tuple
     (work_dir / "license.key").write_text(conteudo_licenca, encoding="utf-8")
     if GUIA_CLIENTE_PATH.exists():
         shutil.copy2(GUIA_CLIENTE_PATH, work_dir / "GUIA_DO_CLIENTE.html")
-    if entrega_tipo == "ATIVACAO_TRIAL" and tipo.upper() != "TRIAL":
+    if somente_licenca:
         texto = (
-            "ATIVAÇÃO - APP ORÇAMENTO FAMILIAR\n\n"
+            "LICENCA ANUAL - APP ORCAMENTO FAMILIAR\n\n"
             "1. Feche o aplicativo.\n"
-            "2. Faça backup do arquivo budget_app.db antes da ativação.\n"
+            "2. Faca backup do arquivo budget_app.db antes da ativacao.\n"
             "3. Substitua somente o arquivo license.key da pasta atual por este novo arquivo.\n"
-            "4. Abra o aplicativo novamente. Seus dados cadastrados no trial permanecem preservados.\n"
-            "5. Consulte GUIA_DO_CLIENTE.html sempre que precisar revisar as funções.\n"
+            "4. Abra o aplicativo novamente.\n"
+            "5. Consulte GUIA_DO_CLIENTE.html sempre que precisar revisar as funcoes.\n"
             "6. Se aparecer uma janela preta do sistema, deixe essa janela aberta enquanto usa o app.\n"
         )
-        (work_dir / "LEIA-ME_ATIVACAO.txt").write_text(texto, encoding="utf-8")
+        (work_dir / "LEIA-ME_LICENCA_ANUAL.txt").write_text(texto, encoding="utf-8")
     else:
         texto = (
-            "APP ORÇAMENTO FAMILIAR\n\n"
+            "APP ORCAMENTO FAMILIAR - LICENCA ANUAL\n\n"
             "1. Extraia todos os arquivos para uma pasta do computador.\n"
             "2. Execute OrcamentoApp.exe.\n"
-            "3. Não apague license.key nem budget_app.db.\n"
+            "3. Nao apague license.key nem budget_app.db.\n"
             "4. Use o botão Backup dentro do aplicativo para preservar seus dados.\n"
             "5. Abra GUIA_DO_CLIENTE.html ou use o botão Guia de Uso dentro do aplicativo.\n"
             "6. Se aparecer uma janela preta do sistema, deixe essa janela aberta enquanto usa o app.\n"
@@ -271,17 +273,17 @@ def html_page() -> str:
         if venda["status"] == "AGUARDANDO_PIX":
             acao = f"""
                 <form method="post" action="/vendas/{venda['id']}/confirmar-pix">
-                    <button>Confirmar PIX e gerar licenca</button>
+                    <button>Confirmar pagamento e gerar licenca anual</button>
                 </form>
             """
         elif venda["tipo"] == "PAGO":
             acao = f"""
                 <form method="post" action="/vendas/{venda['id']}/renovar">
-                    <button>Confirmar PIX e renovar 1 ano</button>
+                    <button>Confirmar pagamento e renovar 1 ano</button>
                 </form>
             """
         else:
-            acao = "<small>Aguardando conversao em venda</small>"
+            acao = "<small>Registro antigo fora do modelo anual</small>"
         linhas.append(
             f"""
             <tr class="{classe}">
@@ -305,7 +307,7 @@ def html_page() -> str:
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Admin de Vendas - OrcamentoApp</title>
+        <title>Admin de Vendas - Plano anual</title>
         <style>
             body {{ font-family: Segoe UI, Arial, sans-serif; margin: 0; background: #f4f6f8; color: #243041; }}
             main {{ max-width: 1180px; margin: 24px auto; padding: 0 16px; }}
@@ -332,7 +334,7 @@ def html_page() -> str:
     </head>
     <body><main>
         <div class="topo">
-            <h1>Admin de Vendas - OrcamentoApp</h1>
+            <h1>Admin de Vendas - Plano anual</h1>
             <form method="post" action="/finalizar">
                 <button class="perigo">Finalizar painel</button>
             </form>
@@ -341,27 +343,27 @@ def html_page() -> str:
             <h2>Armazenamento temporario</h2>
             <p><strong>Pasta:</strong> {escape(str(PACOTES_DIR))}</p>
             <p><strong>Espaco ocupado:</strong> {formatar_tamanho(uso_pacotes)}</p>
-            <p class="nota">Pacotes completos sao temporarios. Depois de enviar ao cliente, use Excluir apos envio. Licencas e dados comerciais continuam registrados no banco administrativo.</p>
+            <p class="nota">Pacotes completos sao temporarios. Depois de enviar ao cliente, use Excluir apos envio. Licencas anuais e dados comerciais continuam registrados no banco administrativo.</p>
             <form method="post" action="/limpar-pacotes-antigos">
                 <button class="secundario">Excluir pacotes com mais de {RETENCAO_PACOTES_DIAS} dias</button>
             </form>
         </section>
         <section>
-            <h2>Novo trial ou venda</h2>
-            <p class="nota">TRIAL gera pacote completo por 7 dias. PAGO fica aguardando PIX e so gera a entrega depois da confirmacao no extrato.</p>
+            <h2>Nova venda anual</h2>
+            <p class="nota">Cadastre somente compras do plano anual. A entrega fica aguardando a confirmacao do pagamento antes de gerar a licenca individual.</p>
             <form class="grid" method="post" action="/vendas">
+                <input type="hidden" name="tipo" value="PAGO">
+                <input type="hidden" name="dias_validade" value="365">
                 <div><label>Cliente</label><input name="cliente_nome" required></div>
                 <div><label>Email</label><input name="cliente_email" type="email" required></div>
                 <div><label>Documento</label><input name="documento"></div>
-                <div><label>Telefone</label><input name="telefone"></div>
+                <div><label>Celular / WhatsApp</label><input name="telefone" placeholder="Ex: (12) 98161-2085" required></div>
                 <div><label>Ambiente</label><input name="ambiente" placeholder="Ex: notebook financeiro"></div>
                 <div><label>Valor</label><input name="valor" type="number" step="0.01" value="0"></div>
-                <div><label>Tipo</label><select name="tipo"><option>TRIAL</option><option>PAGO</option></select></div>
-                <div><label>Entrega</label><select name="entrega_tipo"><option value="INSTALACAO_COMPLETA">Instalacao completa</option><option value="ATIVACAO_TRIAL">Cliente ja possui trial: somente licenca</option></select></div>
+                <div><label>Entrega</label><select name="entrega_tipo"><option value="INSTALACAO_COMPLETA">Instalacao completa</option><option value="SOMENTE_LICENCA">Somente licenca: cliente ja possui instalacao/base</option></select></div>
                 <div><label>Data implantacao</label><input name="data_implantacao" type="date" value="{hoje.isoformat()}" required></div>
-                <div><label>Dias validade</label><input name="dias_validade" type="number" value="7" required></div>
                 <textarea name="observacoes" placeholder="Observacoes comerciais, instalacao, contato..."></textarea>
-                <div class="actions"><button>Cadastrar</button></div>
+                <div class="actions"><button>Cadastrar venda anual</button></div>
             </form>
         </section>
         <section>
@@ -388,22 +390,18 @@ def criar_venda(
     telefone: str = Form(""),
     ambiente: str = Form(""),
     valor: float = Form(0),
-    tipo: str = Form("TRIAL"),
+    tipo: str = Form("PAGO"),
     entrega_tipo: str = Form("INSTALACAO_COMPLETA"),
     data_implantacao: str = Form(...),
-    dias_validade: int = Form(7),
+    dias_validade: int = Form(365),
     observacoes: str = Form(""),
 ):
     tipo = tipo.upper()
     entrega_tipo = entrega_tipo.upper()
-    if tipo == "TRIAL":
-        dias_validade = 7
-        entrega_tipo = "INSTALACAO_COMPLETA"
-    elif tipo == "PAGO":
-        dias_validade = 365
-    else:
-        raise HTTPException(status_code=400, detail="Tipo de venda invalido.")
-    if entrega_tipo not in {"INSTALACAO_COMPLETA", "ATIVACAO_TRIAL"}:
+    if tipo != "PAGO":
+        raise HTTPException(status_code=400, detail="Painel configurado apenas para venda anual.")
+    dias_validade = 365
+    if entrega_tipo not in {"INSTALACAO_COMPLETA", "SOMENTE_LICENCA"}:
         raise HTTPException(status_code=400, detail="Tipo de entrega invalido.")
     implantacao = date.fromisoformat(data_implantacao)
     vencimento = implantacao + timedelta(days=dias_validade)
@@ -423,7 +421,7 @@ def criar_venda(
                 telefone.strip(),
                 ambiente.strip(),
                 tipo,
-                "ATIVO" if tipo == "TRIAL" else "AGUARDANDO_PIX",
+                "AGUARDANDO_PIX",
                 valor,
                 hoje_iso(),
                 implantacao.isoformat(),
@@ -435,8 +433,6 @@ def criar_venda(
             ),
         )
         venda_id = cursor.lastrowid
-    if tipo == "TRIAL":
-        salvar_licenca(venda_id, tipo, dias_validade)
     return RedirectResponse("/", status_code=303)
 
 
@@ -453,7 +449,7 @@ def renovar(venda_id: int):
     vencimento_atual = date.fromisoformat(venda["data_vencimento"])
     data_base = max(vencimento_atual, date.today()).isoformat()
     with get_conn() as conn:
-        conn.execute("UPDATE vendas SET entrega_tipo = 'ATIVACAO_TRIAL' WHERE id = ?", (venda_id,))
+        conn.execute("UPDATE vendas SET entrega_tipo = 'SOMENTE_LICENCA' WHERE id = ?", (venda_id,))
     salvar_licenca(venda_id, "PAGO", 365, data_base=data_base)
     return RedirectResponse("/", status_code=303)
 

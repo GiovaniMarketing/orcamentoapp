@@ -1,6 +1,6 @@
 # App Orcamento Familiar
 
-Aplicativo local para controle financeiro familiar, com receitas, despesas, investimentos simples, relatorio de imposto de renda e licenciamento para trial/pago.
+Aplicativo local para controle financeiro familiar, com receitas, despesas, investimentos simples, relatorio de imposto de renda e licenciamento anual.
 
 ## Recursos do app
 
@@ -31,17 +31,16 @@ Aplicativo local para controle financeiro familiar, com receitas, despesas, inve
 
 Executaveis, bancos, zips, backups, builds e ambiente virtual nao entram no Git. Gere localmente quando necessario.
 
-## Trial e venda
+## Venda anual
 
-O cliente usa o mesmo aplicativo no trial e na versao paga. A ativacao anual acontece substituindo o arquivo `license.key`, preservando o banco `budget_app.db`.
+O modelo comercial atual e focado em plano anual. A ativacao acontece com uma licenca individual `license.key`, preservando o banco `budget_app.db` do cliente.
 
 O Admin de Vendas gera pastas exclusivas com ID e nome do cliente:
 
-- `0001_joao_simone_trial`: aplicativo completo com licenca de avaliacao por 7 dias.
-- `0002_joao_simone_vendido`: aplicativo completo para venda direta.
-- `0003_joao_simone_ativacao`: somente `license.key` para ativar trial ou renovar.
+- `0001_joao_simone_vendido`: aplicativo completo para venda direta anual.
+- `0002_joao_simone_licenca`: somente `license.key` para cliente que ja recebeu a instalacao/base pela Kiwify ou por outro envio.
 
-Vendas pagas ficam com status `AGUARDANDO_PIX`. A licenca anual so e gerada depois da confirmacao manual do pagamento no extrato.
+Vendas anuais ficam com status `AGUARDANDO_PIX`. A licenca anual so e gerada depois da confirmacao manual do pagamento no extrato ou na plataforma de venda.
 
 Depois de enviar um pacote, use `Excluir apos envio` no Admin de Vendas. O painel preserva a licenca no banco e permite `Gerar novamente` quando necessario. Pacotes temporarios com mais de 15 dias sao removidos automaticamente.
 

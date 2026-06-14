@@ -1,0 +1,49 @@
+CHECKLIST RAPIDO PARA PUBLICAR NA KIWIFY
+
+Tutorial completo:
+   TUTORIAL_DEFINITIVO_PLANO_ANUAL_KIWIFY.txt
+
+1. Hospede o arquivo grande:
+   hospedar_externo/App_Orcamento_Familiar_Instalador.zip
+
+   Sugestao pratica: Google Drive, OneDrive, Dropbox ou outro local com link de download.
+   O arquivo passa de 100 MB, portanto nao e recomendado anexar diretamente na Kiwify.
+
+2. Copie o link publico de download.
+
+3. Abra este arquivo pequeno:
+   anexar_na_kiwify/LEIA_ME_DOWNLOAD_APP_ORCAMENTO_FAMILIAR.html
+
+4. Confira se o botao "Baixar instalador" aponta para o arquivo correto no Drive.
+   Se voce trocar o arquivo no Drive, edite o endereco do botao no HTML.
+   Depois de salvar, abra o HTML no navegador e teste o botao.
+
+   Se usar Google Drive, o cliente pode ver a mensagem "Nao foi possivel visualizar o arquivo".
+   Isso e normal para ZIP grande. O HTML ja explica que ele deve clicar em Download.
+
+5. Na Kiwify, crie o produto como:
+   App Orcamento Familiar - Licenca Anual
+
+6. Entrega:
+   Area de membros da Kiwify ou conteudo de download.
+
+7. Anexe na Kiwify somente o arquivo pequeno:
+   LEIA_ME_DOWNLOAD_APP_ORCAMENTO_FAMILIAR.html
+
+8. Apos a venda aprovada:
+   - confira a venda na Kiwify;
+   - aguarde o cliente solicitar a licenca pelo WhatsApp;
+   - abra o Admin de Vendas;
+   - cadastre o cliente;
+   - selecione Somente licenca;
+   - gere a licenca anual;
+   - envie ao cliente o ZIP/arquivo de licenca gerado pelo painel.
+
+9. Nao enviar:
+   - admin_vendas.py;
+   - codigo-fonte;
+   - license.key generico;
+   - banco pessoal com dados reais.
+
+10. Arquivo trial fora da Kiwify:
+   E:\orcamentoapp\OrcamentoApp_TRIAL.zip
